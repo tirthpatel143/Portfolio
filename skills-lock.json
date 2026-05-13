@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "interactive-portfolio": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "github",
+      "skillPath": "skills/interactive-portfolio/SKILL.md",
+      "computedHash": "918d7e69a49cf8162c26c822ee3449cb2630173ac6f48a384da0b108961d03d9"
+    }
+  }
+}
