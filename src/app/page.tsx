@@ -1,9 +1,12 @@
+"use client";
+
 import { 
   ArrowRight, Code, Code2, Briefcase, Mail, ExternalLink, 
   Terminal, Cpu, Globe, Rocket, MessageSquare, 
   Layers, Database, Sparkles, Star, ChevronRight
 } from "lucide-react";
 import Image from "next/image";
+import { motion } from "framer-motion";
 
 export default function Home() {
   const skillCategories = [
@@ -48,8 +51,19 @@ export default function Home() {
     }
   ];
 
+  const fadeInUp = {
+    initial: { opacity: 0, y: 30 },
+    whileInView: { opacity: 1, y: 0 },
+    viewport: { once: true },
+    transition: { duration: 0.6 }
+  };
+
   return (
-    <main>
+    <main style={{ position: 'relative' }}>
+      {/* Animated Orbs */}
+      <div className="orb orb-primary"></div>
+      <div className="orb orb-secondary"></div>
+
       {/* Navbar */}
       <nav className="nav glass">
         <div className="container flex" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
@@ -70,7 +84,12 @@ export default function Home() {
         <div className="hero-bg"></div>
         <div className="hero-overlay"></div>
         <div className="container">
-          <div className="animate-fade-in" style={{ textAlign: 'center', maxWidth: '1000px', margin: '0 auto' }}>
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8 }}
+            style={{ textAlign: 'center', maxWidth: '1000px', margin: '0 auto' }}
+          >
             <div className="flex-center" style={{ marginBottom: '2rem' }}>
               <span className="tag animate-float" style={{ background: 'rgba(59, 130, 246, 0.1)', borderColor: 'rgba(59, 130, 246, 0.3)', color: '#60a5fa', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <span style={{ width: '8px', height: '8px', background: '#10b981', borderRadius: '50%', display: 'inline-block' }}></span>
@@ -86,39 +105,60 @@ export default function Home() {
               intelligence with world-class design. Turning ideas into scalable reality.
             </p>
             <div className="flex-center" style={{ gap: '1.5rem', flexWrap: 'wrap' }}>
-              <a href="#projects" className="btn btn-primary" style={{ fontSize: '1.1rem' }}>
+              <motion.a 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                href="#projects" 
+                className="btn btn-primary" 
+                style={{ fontSize: '1.1rem' }}
+              >
                 View Portfolio <ChevronRight size={20} />
-              </a>
-              <a href="#contact" className="btn btn-outline" style={{ fontSize: '1.1rem' }}>
+              </motion.a>
+              <motion.a 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                href="#contact" 
+                className="btn btn-outline" 
+                style={{ fontSize: '1.1rem' }}
+              >
                 Get in Touch
-              </a>
+              </motion.a>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* Social Proof / Stats */}
-      <section style={{ padding: '2rem 0', background: 'rgba(255,255,255,0.02)', borderY: '1px solid var(--glass-border)' }}>
+      <section style={{ padding: '2rem 0', background: 'rgba(255,255,255,0.02)', borderTop: '1px solid var(--glass-border)', borderBottom: '1px solid var(--glass-border)' }}>
         <div className="container flex-center" style={{ gap: '4rem', flexWrap: 'wrap' }}>
-          <div style={{ textAlign: 'center' }}>
-             <h3 style={{ fontSize: '2.5rem', fontWeight: 800 }} className="text-gradient">5+</h3>
-             <p style={{ color: '#71717a', fontSize: '0.9rem', fontWeight: 600 }}>Years Exp.</p>
-          </div>
-          <div style={{ textAlign: 'center' }}>
-             <h3 style={{ fontSize: '2.5rem', fontWeight: 800 }} className="text-gradient">50+</h3>
-             <p style={{ color: '#71717a', fontSize: '0.9rem', fontWeight: 600 }}>Projects Delivered</p>
-          </div>
-          <div style={{ textAlign: 'center' }}>
-             <h3 style={{ fontSize: '2.5rem', fontWeight: 800 }} className="text-gradient">100k+</h3>
-             <p style={{ color: '#71717a', fontSize: '0.9rem', fontWeight: 600 }}>Lines of Code</p>
-          </div>
+          {[
+            { label: "Years Exp.", value: "5+" },
+            { label: "Projects Delivered", value: "50+" },
+            { label: "Lines of Code", value: "100k+" }
+          ].map((stat, i) => (
+            <motion.div 
+              key={i}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.1 }}
+              viewport={{ once: true }}
+              style={{ textAlign: 'center' }}
+            >
+               <h3 style={{ fontSize: '2.5rem', fontWeight: 800 }} className="text-gradient">{stat.value}</h3>
+               <p style={{ color: '#71717a', fontSize: '0.9rem', fontWeight: 600 }}>{stat.label}</p>
+            </motion.div>
+          ))}
         </div>
       </section>
 
       {/* Projects Section */}
       <section id="projects" className="section">
         <div className="container">
-          <div className="flex" style={{ justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '4rem' }}>
+          <motion.div 
+            {...fadeInUp}
+            className="flex" 
+            style={{ justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '4rem' }}
+          >
             <div>
               <h2 style={{ fontSize: '3.5rem', fontWeight: 800 }}>Featured <span className="text-gradient">Work</span></h2>
               <p style={{ color: '#a1a1aa', fontSize: '1.1rem' }}>Proven results across AI, FinTech, and SEO.</p>
@@ -126,10 +166,19 @@ export default function Home() {
             <a href="#" className="flex" style={{ alignItems: 'center', gap: '0.5rem', color: '#3b82f6', fontWeight: 600 }}>
               See all projects <ExternalLink size={16} />
             </a>
-          </div>
+          </motion.div>
+          
           <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2.5rem' }}>
             {projects.map((project, i) => (
-              <div key={i} className="glass-card" style={{ padding: '2.5rem', position: 'relative' }}>
+              <motion.div 
+                key={i}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.2 }}
+                viewport={{ once: true }}
+                className="glass-card" 
+                style={{ padding: '2.5rem', position: 'relative' }}
+              >
                 <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem' }}>
                   <span className="tag" style={{ fontSize: '0.7rem', background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' }}>
                     {project.impact}
@@ -144,7 +193,7 @@ export default function Home() {
                 <a href={project.link} className="btn btn-outline" style={{ width: '100%', justifyContent: 'center' }}>
                   View Case Study
                 </a>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -153,12 +202,22 @@ export default function Home() {
       {/* Skills Section - Categorized */}
       <section id="skills" className="section" style={{ background: 'rgba(255,255,255,0.01)' }}>
         <div className="container">
-          <h2 style={{ fontSize: '3rem', fontWeight: 800, marginBottom: '4rem', textAlign: 'center' }}>
+          <motion.h2 
+            {...fadeInUp}
+            style={{ fontSize: '3rem', fontWeight: 800, marginBottom: '4rem', textAlign: 'center' }}
+          >
             Technical <span className="text-gradient">Arsenal</span>
-          </h2>
+          </motion.h2>
           <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
             {skillCategories.map((cat, idx) => (
-              <div key={idx} className="glass-card" style={{ padding: '2.5rem' }}>
+              <motion.div 
+                key={idx} 
+                initial={{ opacity: 0, x: idx % 2 === 0 ? -20 : 20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                className="glass-card" 
+                style={{ padding: '2.5rem' }}
+              >
                 <div className="flex" style={{ alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
                    <div style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.05)', borderRadius: '12px' }}>
                       {cat.icon}
@@ -167,10 +226,17 @@ export default function Home() {
                 </div>
                 <div className="flex" style={{ flexWrap: 'wrap', gap: '0.8rem' }}>
                   {cat.skills.map(skill => (
-                    <span key={skill} className="tag" style={{ fontWeight: 600 }}>{skill}</span>
+                    <motion.span 
+                      whileHover={{ scale: 1.1, backgroundColor: 'rgba(59, 130, 246, 0.1)' }}
+                      key={skill} 
+                      className="tag" 
+                      style={{ fontWeight: 600, cursor: 'default' }}
+                    >
+                      {skill}
+                    </motion.span>
                   ))}
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -179,7 +245,11 @@ export default function Home() {
       {/* Testimonial / Trust */}
       <section className="section">
         <div className="container">
-           <div className="glass-card" style={{ padding: '4rem', textAlign: 'center', maxWidth: '900px', margin: '0 auto' }}>
+           <motion.div 
+            {...fadeInUp}
+            className="glass-card" 
+            style={{ padding: '4rem', textAlign: 'center', maxWidth: '900px', margin: '0 auto' }}
+           >
               <Star className="text-gradient" size={40} style={{ marginBottom: '2rem', margin: '0 auto' }} />
               <p style={{ fontSize: '1.8rem', fontWeight: 500, lineHeight: 1.5, marginBottom: '2.5rem', fontStyle: 'italic' }}>
                 "Tirth didn't just build our SEO dashboard; he built a system that thinks for us. 
@@ -189,14 +259,20 @@ export default function Home() {
                 <p style={{ fontWeight: 800, fontSize: '1.2rem' }}>Alex Rivera</p>
                 <p style={{ color: '#71717a' }}>Product Director @ Hermes Tech</p>
               </div>
-           </div>
+           </motion.div>
         </div>
       </section>
 
       {/* Final Conversion CTA */}
       <section id="contact" className="section" style={{ paddingBottom: '150px' }}>
         <div className="container">
-          <div className="glass-card contact-card" style={{ padding: '5rem', textAlign: 'center', background: 'linear-gradient(135deg, rgba(59,130,246,0.05), rgba(168,85,247,0.05))' }}>
+          <motion.div 
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="glass-card contact-card" 
+            style={{ padding: '5rem', textAlign: 'center', position: 'relative', overflow: 'hidden' }}
+          >
             <h2 style={{ fontSize: '4rem', fontWeight: 900, marginBottom: '1.5rem', letterSpacing: '-2px' }}>
               Ready to Build <span className="text-gradient">Something Iconic?</span>
             </h2>
@@ -204,9 +280,15 @@ export default function Home() {
               Currently accepting new high-impact projects. Let's discuss how we can scale your vision.
             </p>
             <div className="flex-center" style={{ gap: '1.5rem', flexWrap: 'wrap', marginBottom: '4rem' }}>
-              <a href="mailto:hello@tirthpatel.dev" className="btn btn-primary" style={{ fontSize: '1.2rem', padding: '1rem 3rem' }}>
+              <motion.a 
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                href="mailto:hello@tirthpatel.dev" 
+                className="btn btn-primary" 
+                style={{ fontSize: '1.2rem', padding: '1rem 3rem' }}
+              >
                 Start a Conversation
-              </a>
+              </motion.a>
               <a href="#" className="btn btn-outline" style={{ fontSize: '1.2rem', padding: '1rem 3rem' }}>
                 Download CV
               </a>
@@ -216,7 +298,7 @@ export default function Home() {
               <a href="#" className="flex" style={{ gap: '0.5rem', color: '#a1a1aa' }}><Briefcase size={20} /> LinkedIn</a>
               <a href="#" className="flex" style={{ gap: '0.5rem', color: '#a1a1aa' }}><Mail size={20} /> Email</a>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
 

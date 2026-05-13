@@ -1,6 +1,12 @@
 {
   "version": 1,
   "skills": {
+    "developer-portfolio": {
+      "source": "eng0ai/eng0-template-skills",
+      "sourceType": "github",
+      "skillPath": "developer-portfolio/SKILL.md",
+      "computedHash": "8dc2f90d1307a15935c50bd7ab7498df4d5d66386e1bd1763f18201caeb1ac78"
+    },
     "interactive-portfolio": {
       "source": "sickn33/antigravity-awesome-skills",
       "sourceType": "github",
