@@ -121,7 +121,7 @@ export default function Home() {
       </section>
 
       {/* Skills Section */}
-      <section id="skills" className="section" style={{ background: 'rgba(255,255,255,0.01)', borderY: '1px solid var(--glass-border)' }}>
+      <section id="skills" className="section" style={{ background: 'rgba(255,255,255,0.01)', borderTop: '1px solid var(--glass-border)', borderBottom: '1px solid var(--glass-border)' }}>
         <div className="container">
           <h2 style={{ fontSize: '3rem', fontWeight: 800, marginBottom: '4rem', textAlign: 'center' }}>
             My <span className="text-gradient">Stack</span>
