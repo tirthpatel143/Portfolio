@@ -15,6 +15,13 @@ export async function POST(request: Request) {
     const emailAddress = process.env.EMAIL_ADDRESS || "tirth.p.patel143@gmail.com";
     const rawPasskey = process.env.GMAIL_PASSKEY;
 
+    console.log("============ 🛠️ contact/route.ts DEBUG ============");
+    console.log("EMAIL_ADDRESS:", emailAddress);
+    console.log("rawPasskey is defined:", !!rawPasskey);
+    console.log("rawPasskey length:", rawPasskey ? rawPasskey.length : 0);
+    console.log("All environment keys containing 'GMAIL' or 'PASS':", Object.keys(process.env).filter(k => k.toUpperCase().includes("GMAIL") || k.toUpperCase().includes("PASS")));
+    console.log("====================================================");
+
     if (!rawPasskey) {
       console.warn("GMAIL_PASSKEY is not defined in environment variables. Email will not be sent.");
       return NextResponse.json(
