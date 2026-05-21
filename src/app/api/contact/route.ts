@@ -13,15 +13,18 @@ export async function POST(request: Request) {
     }
 
     const emailAddress = process.env.EMAIL_ADDRESS || "tirth.p.patel143@gmail.com";
-    const gmailPasskey = process.env.GMAIL_PASSKEY;
+    const rawPasskey = process.env.GMAIL_PASSKEY;
 
-    if (!gmailPasskey) {
+    if (!rawPasskey) {
       console.warn("GMAIL_PASSKEY is not defined in environment variables. Email will not be sent.");
       return NextResponse.json(
         { error: "Email backend is not configured yet. Please configure GMAIL_PASSKEY in your environment." },
         { status: 500 }
       );
     }
+
+    // Automatically strip any spaces copy-pasted from Gmail settings
+    const gmailPasskey = rawPasskey.replace(/\s+/g, "");
 
     // Set up Gmail Nodemailer transporter
     const transporter = nodemailer.createTransport({
