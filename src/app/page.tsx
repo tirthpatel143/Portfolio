@@ -324,16 +324,33 @@ export default function Home() {
     return projectsData.filter(p => p.category.includes(activeCategory) || p.tech.some(t => t.toLowerCase() === activeCategory.toLowerCase()));
   }, [activeCategory]);
 
-  const handleContactSubmit = (e: React.FormEvent) => {
+  const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!formData.name || !formData.email || !formData.message) return;
 
     setFormStatus('sending');
-    setTimeout(() => {
-      setFormStatus('success');
-      setFormData({ name: '', email: '', message: '' });
-      setTimeout(() => setFormStatus('idle'), 6000);
-    }, 1500);
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok && result.success) {
+        setFormStatus('success');
+        setFormData({ name: '', email: '', message: '' });
+        setTimeout(() => setFormStatus('idle'), 6000);
+      } else {
+        alert(result.error || "Failed to dispatch message. Please try again or email directly!");
+        setFormStatus('idle');
+      }
+    } catch (err) {
+      console.error("Form submission error:", err);
+      alert("A network error occurred. Please verify your connection or email directly!");
+      setFormStatus('idle');
+    }
   };
 
   return (
