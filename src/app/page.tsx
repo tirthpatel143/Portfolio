@@ -260,10 +260,58 @@ export default function Home() {
         );
         break;
       default:
-        newHistory.push({
-          type: 'error',
-          text: `Command not found: "${terminalInput}". Type "help" to see available options.`
-        });
+        // Smart natural language query fallback
+        const query = inputCmd.toLowerCase();
+        if (query.includes('hi') || query.includes('hello') || query.includes('hey') || query.includes('yo ') || query.trim() === 'yo') {
+          newHistory.push({
+            type: 'output',
+            text: "👋 Hello! I am Tirth's virtual AI representative. Ask me about Tirth's background, projects, skills, or experience!"
+          });
+        } else if (query.includes('project') || query.includes('work') || query.includes('build') || query.includes('develop') || query.includes('yogateria') || query.includes('nexus') || query.includes('smartin') || query.includes('social media')) {
+          newHistory.push(
+            { type: 'output', text: '🎯 Active Production Projects:' },
+            { type: 'success', text: '  1. Yogateria - Production RAG chatbot serving live Medusa catalogs.' },
+            { type: 'success', text: '  2. SEO-Improve - AI SEO audit agent framework based on Hermes.' },
+            { type: 'success', text: '  3. Nexus - Stock forecasting using comparative ARIMA & LSTM models.' },
+            { type: 'success', text: '  4. Social Media Analytics - Multi-platform real-time dashboard.' },
+            { type: 'success', text: '  5. SmartIn - Speech recognition hands-free voice assistant.' },
+            { type: 'output', text: '(Type "projects" to see full specs or scroll down to the projects section!)' }
+          );
+        } else if (query.includes('skill') || query.includes('tech') || query.includes('tool') || query.includes('language') || query.includes('python') || query.includes('javascript') || query.includes('typescript') || query.includes('database') || query.includes('vector') || query.includes('qdrant') || query.includes('sql') || query.includes('postgre')) {
+          newHistory.push(
+            { type: 'output', text: "🛠️ Tirth's Technical Arsenal Highlights:" },
+            { type: 'success', text: '  - AI Frameworks: LangChain, LlamaIndex, Qdrant Vector DB, Faiss, RAG' },
+            { type: 'success', text: '  - Code Languages: Python (Pandas, NumPy, Seaborn), SQL, TypeScript' },
+            { type: 'success', text: '  - Database & Web: PostgreSQL, MySQL, FastAPI, Flask, Next.js, React' }
+          );
+        } else if (query.includes('experience') || query.includes('intern') || query.includes('job') || query.includes('special character') || query.includes('zidio')) {
+          newHistory.push(
+            { type: 'output', text: '💼 Professional Timeline Highlights:' },
+            { type: 'success', text: '  - AI/ML Intern at The Special Character: Developed RAG retrieval in pgvector.' },
+            { type: 'success', text: '  - Data Science Trainee at Zidio Development: Analytics visualizer.' },
+            { type: 'output', text: '(Scroll down to the timeline section to view location, dates, and CGPA!)' }
+          );
+        } else if (query.includes('education') || query.includes('college') || query.includes('ldrp') || query.includes('university') || query.includes('school') || query.includes('study') || query.includes('degree')) {
+          newHistory.push(
+            { type: 'output', text: '🎓 Academic Summary:' },
+            { type: 'success', text: '  - B.E. in Information Technology at LDRP Institute (CGPA: 8.27/10)' },
+            { type: 'success', text: '  - 12th Science at P.P.G Experimental High School' }
+          );
+        } else if (query.includes('contact') || query.includes('hire') || query.includes('email') || query.includes('phone') || query.includes('call') || query.includes('reach') || query.includes('mail')) {
+          newHistory.push(
+            { type: 'output', text: '📧 Connect Coordinates:' },
+            { type: 'success', text: '  - Email: tirth.p.patel143@gmail.com' },
+            { type: 'success', text: '  - Phone: +91 6353782035' },
+            { type: 'success', text: '  - GitHub: github.com/tirthpatel143' },
+            { type: 'success', text: '  - LinkedIn: linkedin.com/in/tirthpatel143' }
+          );
+        } else {
+          // General friendly fallback response instead of strict error
+          newHistory.push({
+            type: 'output',
+            text: `🤖 AI Assistant: Great query! Tirth is highly expert in AI agents & RAG. Ask me about his 'projects', 'skills', or 'experience' directly, or check out the sections below!`
+          });
+        }
     }
 
     setTerminalHistory(newHistory);
@@ -400,7 +448,7 @@ export default function Home() {
                     <input 
                       type="text" 
                       className="terminal-text-input" 
-                      placeholder="Type a command (e.g. 'help', 'skills', 'hermes')..."
+                      placeholder="Ask a question or type a command (e.g. 'skills', 'hermes')..."
                       value={terminalInput}
                       onChange={(e) => setTerminalInput(e.target.value)}
                     />
