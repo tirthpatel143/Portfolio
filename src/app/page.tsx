@@ -1,14 +1,149 @@
 "use client";
 
+import { useState, useRef } from "react";
 import { 
   ArrowRight, Code, Code2, Briefcase, Mail, ExternalLink, 
   Terminal, Cpu, Globe, Rocket, MessageSquare, 
-  Layers, Database, Sparkles, Star, ChevronRight
+  Layers, Database, Sparkles, Star, ChevronRight,
+  Send, RefreshCw, Play
 } from "lucide-react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 
 export default function Home() {
+  const [terminalLines, setTerminalLines] = useState<string[]>([
+    "Initializing Nous Hermes Terminal environment...",
+    "Loading LLM provider: openrouter/google/gemini-2.5-flash:free...",
+    "Ready. Type a command or click one of the quick actions below.",
+    "Type 'help' to see available commands."
+  ]);
+  const [inputValue, setInputValue] = useState("");
+  const [isTyping, setIsTyping] = useState(false);
+  const terminalEndRef = useRef<HTMLDivElement>(null);
+
+  const handleCommand = async (cmd: string) => {
+    if (!cmd.trim() || isTyping) return;
+    setIsTyping(true);
+    
+    // Add command to terminal
+    setTerminalLines(prev => [...prev, `tirthdev@macos ~ % ${cmd}`]);
+    setInputValue("");
+    
+    // Auto-scroll
+    setTimeout(() => {
+      terminalEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 50);
+
+    // Simulate thinking delay
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    const lowerCmd = cmd.toLowerCase().trim();
+    let responseLines: string[] = [];
+
+    if (lowerCmd === "help" || lowerCmd === "/help") {
+      responseLines = [
+        "🤖 Nous Hermes - Available commands:",
+        "  /xurl           - Initialize xurl skill & verify X API credentials",
+        "  whoami          - Query current authenticated X handle details",
+        "  post [text]     - Draft and post a new update to X via Free API",
+        "  bookmarks       - Fetch and ingest user bookmarks (Free fallback enabled)",
+        "  help            - View this instructions panel",
+        "  clear           - Wipe the terminal output clean"
+      ];
+    } else if (lowerCmd === "clear") {
+      setTerminalLines([]);
+      setIsTyping(false);
+      return;
+    } else if (lowerCmd === "/xurl") {
+      responseLines = [
+        "⚡ Loading X-Agent skill: xurl...",
+        "⚙️ Scanning PATH for xurl executable...",
+        "   ✓ Found xurl CLI at ~/.local/bin/xurl (v1.2.0)",
+        "🔑 Validating X developer application credentials...",
+        "   ✓ App Name: 'my-portfolio-app'",
+        "   ✓ Client ID: 817f39...0a1h (Free Tier Write-Only)",
+        "📡 Establishing OAuth 2.0 Handshake...",
+        "   ✓ Tokens verified (stored in ~/.hermes/auth.json)",
+        "👤 Authenticated as X user: @tirthdev",
+        "",
+        "✓ X-Agent skill loaded. You are ready to tweet & interact conversationally for $0!"
+      ];
+    } else if (lowerCmd === "whoami") {
+      responseLines = [
+        "📡 Running: xurl whoami",
+        "-------------------------------------------------------",
+        "  Authorized X Username : @tirthdev",
+        "  Client Application    : my-portfolio-app",
+        "  OAuth 2.0 Scopes      : tweet.read, tweet.write, users.read",
+        "  Active API Plan       : Free Tier ($0/month Limit)",
+        "  Daily Limits          : 50 posts/day max (1,500/month)",
+        "  Connectivity Status   : HEALTHY (200 OK)",
+        "-------------------------------------------------------"
+      ];
+    } else if (lowerCmd.startsWith("post ")) {
+      const tweetText = cmd.slice(5).replace(/^['"]|['"]$/g, "");
+      responseLines = [
+        "🧠 Intent Detected: Post text update to X (Twitter)",
+        `📝 Content: "${tweetText}"`,
+        "📋 Planning steps:",
+        "  1. Verify tweet length (less than 280 chars)",
+        "  2. Invoke xurl CLI: xurl post [content]",
+        "  3. Monitor JSON callback for tweet ID & URL",
+        "",
+        "🚀 Executing: xurl post \"mock_payload\"...",
+        "   Sending payload to api.twitter.com/2/tweets...",
+        "   ✓ API 201 Created response received!",
+        "",
+        "🎉 SUCCESS! Posted to X for $0.00!",
+        "-------------------------------------------------------",
+        "  Tweet ID  : 2047107136023650625",
+        "  Author    : @tirthdev",
+        `  Text      : "${tweetText}"`,
+        `  Link      : https://x.com/tirthdev/status/2047107136023650625`,
+        "-------------------------------------------------------"
+      ];
+    } else if (lowerCmd === "bookmarks") {
+      responseLines = [
+        "🧠 Intent Detected: Retrieve bookmarks",
+        "📡 Executing: xurl bookmarks -n 5...",
+        "",
+        "⚠️ X API Free Tier limitation encountered: endpoint requires Basic Tier ($100/mo).",
+        "💡 Smart fallback activated: Ingesting local bookmarks database (bookmarks.json)...",
+        "",
+        "📂 Found 3 bookmarks cached in Hermes memory:",
+        "  1. [@nousresearch] 'Nous Hermes 1.0 terminal agent is officially released!' (Tools, planning, execution in your terminal)",
+        "  2. [@karpathy] 'AI agents running on your local shell represent a major UX shift. Standard APIs meet raw bash capability.'",
+        "  3. [@xdevplatform] 'xurl CLI tool makes OAuth 2.0 scripting for X incredibly easy...'"
+      ];
+    } else {
+      responseLines = [
+        `🧠 Nous Hermes is thinking... input: "${cmd}"`,
+        "🤖 Response:",
+        `  \"I recognized your custom prompt! To interact with the X API, please try:`,
+        `   - '/xurl' to initialize the skill`,
+        `   - 'whoami' to view credential details`,
+        `   - 'post \"[your message]\"' to post to X for free!\"`
+      ];
+    }
+
+    // Print lines with minor typing delay
+    for (let i = 0; i < responseLines.length; i++) {
+      await new Promise(resolve => setTimeout(resolve, 80));
+      setTerminalLines(prev => [...prev, responseLines[i]]);
+      setTimeout(() => {
+        terminalEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 20);
+    }
+    
+    setIsTyping(false);
+  };
+
+  const clickSuggestion = (text: string) => {
+    if (isTyping) return;
+    setInputValue(text);
+    handleCommand(text);
+  };
+
   const skillCategories = [
     {
       title: "Intelligence & Backend",
@@ -41,6 +176,13 @@ export default function Home() {
       tech: ["FastAPI", "React", "yfinance"],
       impact: "98% Accuracy Rate",
       link: "#"
+    },
+    {
+      title: "Hermes X-Agent (xurl)",
+      description: "Connected Nous Hermes to X (Twitter) using OAuth 2.0 and xurl CLI, enabling conversational posting and bookmark ingestion at $0.",
+      tech: ["Nous Hermes", "xurl CLI", "OAuth 2.0", "Next.js"],
+      impact: "100% Free Autonomous Posting",
+      link: "#hermes-demo"
     },
     {
       title: "Aura AI Dashboard",
@@ -195,6 +337,195 @@ export default function Home() {
                 </a>
               </motion.div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Hermes Interactive Playground */}
+      <section id="hermes-demo" className="section" style={{ background: 'linear-gradient(180deg, rgba(10,10,10,0) 0%, rgba(59,130,246,0.03) 50%, rgba(10,10,10,0) 100%)', position: 'relative', overflow: 'hidden' }}>
+        {/* Decorative Grid Background */}
+        <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px)', backgroundSize: '40px 40px', zIndex: -1 }}></div>
+        
+        <div className="container">
+          <div style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto 4rem' }}>
+            <span className="tag animate-float" style={{ background: 'rgba(168, 85, 247, 0.1)', borderColor: 'rgba(168, 85, 247, 0.3)', color: '#d8b4fe', marginBottom: '1.5rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Cpu size={16} /> Live Simulation
+            </span>
+            <h2 style={{ fontSize: '3.5rem', fontWeight: 800, marginBottom: '1.5rem', letterSpacing: '-2px' }}>
+              Nous Hermes <span className="text-gradient">X-Agent Terminal</span>
+            </h2>
+            <p style={{ color: '#a1a1aa', fontSize: '1.2rem', lineHeight: 1.6 }}>
+              Experience how my autonomous terminal agent connects to the X API using <strong>xurl</strong>, OAuth 2.0, and OpenRouter free-tier LLMs for a <strong>$0 setup cost</strong>.
+            </p>
+          </div>
+
+          <div className="grid" style={{ gridTemplateColumns: '1fr', gap: '3rem', maxWidth: '950px', margin: '0 auto' }}>
+            {/* Terminal Mockup */}
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="glass-card" 
+              style={{ 
+                padding: '0', 
+                overflow: 'hidden', 
+                border: '1px solid rgba(59, 130, 246, 0.2)',
+                boxShadow: '0 25px 50px -12px rgba(59, 130, 246, 0.15)',
+                display: 'flex',
+                flexDirection: 'column',
+                borderRadius: '16px'
+              }}
+            >
+              {/* Terminal Header */}
+              <div style={{ 
+                background: 'rgba(255, 255, 255, 0.03)', 
+                borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+                padding: '0.8rem 1.2rem',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between'
+              }}>
+                <div className="flex" style={{ gap: '0.5rem' }}>
+                  <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#ef4444', display: 'block' }}></span>
+                  <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#eab308', display: 'block' }}></span>
+                  <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#22c55e', display: 'block' }}></span>
+                </div>
+                <div style={{ fontSize: '0.8rem', color: '#71717a', fontFamily: 'monospace', fontWeight: 600 }}>
+                  hermes-xurl-agent ~ bash
+                </div>
+                <div style={{ width: '48px' }}></div>
+              </div>
+
+              {/* Terminal Screen */}
+              <div style={{ 
+                background: '#070a13', 
+                color: '#34d399', 
+                fontFamily: 'Courier New, Courier, monospace', 
+                padding: '1.5rem', 
+                height: '400px', 
+                overflowY: 'auto',
+                fontSize: '0.95rem',
+                lineHeight: 1.5,
+                borderBottom: '1px solid rgba(255, 255, 255, 0.05)'
+              }}>
+                {terminalLines.map((line, idx) => {
+                  let style: React.CSSProperties = { whiteSpace: 'pre-wrap', marginBottom: '0.4rem' };
+                  if (line.startsWith("tirthdev@macos")) {
+                    style.color = '#60a5fa'; // Blue for prompt commands
+                    style.fontWeight = 'bold';
+                  } else if (line.startsWith("⚠️")) {
+                    style.color = '#fbbf24'; // Yellow for warnings
+                  } else if (line.startsWith("✓") || line.startsWith("🎉") || line.startsWith("SUCCESS")) {
+                    style.color = '#34d399'; // Green for successes
+                  } else if (line.startsWith("🧠") || line.startsWith("⚙️") || line.startsWith("📡") || line.startsWith("⚡")) {
+                    style.color = '#c084fc'; // Purple for logs / metadata
+                  } else if (line.startsWith("----------------")) {
+                    style.color = '#4b5563'; // Gray dividers
+                  } else if (line.includes("Authorized X") || line.includes("Tweet ID") || line.includes("Text") || line.includes("Link")) {
+                    style.color = '#e2e8f0'; // Off-white for credential values
+                  } else if (line.startsWith("Available commands")) {
+                    style.color = '#a1a1aa'; // Muted gray
+                  }
+                  
+                  return (
+                    <div key={idx} style={style}>
+                      {line}
+                    </div>
+                  );
+                })}
+                {isTyping && (
+                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', color: '#a1a1aa', fontStyle: 'italic', marginTop: '0.5rem' }}>
+                    <RefreshCw size={14} className="animate-spin" /> Hermes is running skill pipelines...
+                  </div>
+                )}
+                <div ref={terminalEndRef} />
+              </div>
+
+              {/* Terminal Form Input */}
+              <form 
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleCommand(inputValue);
+                }}
+                style={{ 
+                  background: 'rgba(255, 255, 255, 0.01)', 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  padding: '1rem 1.5rem',
+                  gap: '1rem'
+                }}
+              >
+                <span style={{ color: '#60a5fa', fontFamily: 'monospace', fontWeight: 'bold', fontSize: '1rem', whiteSpace: 'nowrap' }}>
+                  tirthdev@macos ~ %
+                </span>
+                <input 
+                  type="text" 
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  disabled={isTyping}
+                  placeholder="Type a command (e.g. whoami, /xurl, post 'Hello World', bookmarks)..."
+                  style={{ 
+                    background: 'transparent', 
+                    border: 'none', 
+                    outline: 'none', 
+                    color: 'white', 
+                    fontFamily: 'monospace', 
+                    fontSize: '1rem',
+                    flex: 1,
+                    caretColor: '#3b82f6'
+                  }}
+                />
+                <button 
+                  type="submit" 
+                  disabled={isTyping || !inputValue.trim()}
+                  className="btn btn-primary" 
+                  style={{ 
+                    padding: '0.6rem 1.2rem', 
+                    borderRadius: '8px', 
+                    fontSize: '0.85rem',
+                    opacity: (isTyping || !inputValue.trim()) ? 0.5 : 1,
+                    cursor: (isTyping || !inputValue.trim()) ? 'not-allowed' : 'pointer'
+                  }}
+                >
+                  Run <Send size={14} />
+                </button>
+              </form>
+            </motion.div>
+
+            {/* Quick Actions Panel */}
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ color: '#71717a', fontSize: '0.95rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1.2rem' }}>
+                💡 Click a quick command to execute immediately:
+              </p>
+              <div className="flex-center" style={{ gap: '1rem', flexWrap: 'wrap' }}>
+                {[
+                  { label: "Initialize Skill", cmd: "/xurl" },
+                  { label: "Check Session", cmd: "whoami" },
+                  { label: "Post Free Tweet", cmd: 'post "Building autonomous agent pipelines for $0! 🤖"' },
+                  { label: "Fetch Bookmarks", cmd: "bookmarks" },
+                  { label: "Get Help Menu", cmd: "help" }
+                ].map((s, i) => (
+                  <button
+                    key={i}
+                    onClick={() => clickSuggestion(s.cmd)}
+                    disabled={isTyping}
+                    className="btn btn-outline"
+                    style={{ 
+                      fontSize: '0.85rem', 
+                      padding: '0.5rem 1.2rem', 
+                      borderRadius: '99px',
+                      fontFamily: 'monospace',
+                      background: 'rgba(255,255,255,0.02)',
+                      border: '1px solid rgba(255,255,255,0.06)',
+                      transition: 'all 0.2s',
+                      cursor: isTyping ? 'not-allowed' : 'pointer'
+                    }}
+                  >
+                    <Play size={10} className="text-gradient" /> {s.cmd.startsWith("post") ? "post" : s.cmd}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
