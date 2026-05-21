@@ -1,567 +1,579 @@
 "use client";
 
-import { useState, useRef } from "react";
 import { 
-  ArrowRight, Code, Code2, Briefcase, Mail, ExternalLink, 
+  ArrowRight, Code2, Briefcase, Mail, ExternalLink, 
   Terminal, Cpu, Globe, Rocket, MessageSquare, 
   Layers, Database, Sparkles, Star, ChevronRight,
-  Send, RefreshCw, Play
+  CheckCircle2, MapPin, Award, Send, Phone
 } from "lucide-react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useRef, useMemo } from "react";
+
+// Inline Custom SVGs for Robust Icons
+const GithubIcon = ({ size = 20, className = "" }: { size?: number; className?: string }) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+  >
+    <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" />
+    <path d="M9 18c-4.51 2-5-2-7-2" />
+  </svg>
+);
+
+const LinkedInIcon = ({ size = 20, className = "" }: { size?: number; className?: string }) => (
+  <svg 
+    xmlns="http://www.w3.org/2000/svg" 
+    width={size} 
+    height={size} 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round" 
+    className={className}
+  >
+    <path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z" />
+    <rect width="4" height="12" x="2" y="9" />
+    <circle cx="4" cy="4" r="2" />
+  </svg>
+);
+
+interface Project {
+  title: string;
+  description: string;
+  tech: string[];
+  category: string;
+  impact: string;
+  link: string;
+}
+
+// Project Data
+const projectsData: Project[] = [
+  {
+    title: "Yogateria - RAG ChatBot",
+    description: "Building a production RAG chatbot for a live Brazilian yoga e-commerce platform named Yogateria, serving personalized product recommendations grounded exclusively in a real-time Medusa product catalog along with personalized memory summarization and real-time fetching of user’s past order history using tinyEPR API.",
+    tech: ["LlamaIndex", "Qdrant", "PostgreSQL", "FastAPI", "Medusa API"],
+    category: "AI & Agents",
+    impact: "Zero-hallucination recommendation pipeline",
+    link: "https://github.com/tirthpatel143"
+  },
+  {
+    title: "SEO-Improve - Hermes Agent SEO",
+    description: "Built an AI-powered SEO improvement assistant using the Hermes Agent framework to automate SEO-related tasks and content optimization workflows. Worked on integrating AI models through OpenRouter APIs and experimented with intelligent automation for improving website content, keyword handling, and productivity-based operations.",
+    tech: ["Python", "Hermes Agent Framework", "OpenRouter API", "NLP", "Git"],
+    category: "AI & Agents",
+    impact: "95% content audit automation",
+    link: "https://github.com/tirthpatel143"
+  },
+  {
+    title: "Nexus - Time Series Analysis And Forecasting",
+    description: "Designed and implemented a full-stack solution for stock market time series analysis and forecasting using Python and TypeScript. Developed predictive models and integrated data visualization dashboards for real-time trend insights. Implemented ARIMA, Prophet, and LSTM models to compare accuracy and optimize predictions.",
+    tech: ["Python", "TypeScript", "Streamlit", "Flask", "ARIMA", "Prophet", "LSTM"],
+    category: "Data Science",
+    impact: "98% Forecasting Accuracy",
+    link: "https://github.com/tirthpatel143"
+  },
+  {
+    title: "AI-Powered Social Media Analytics Dashboard",
+    description: "Developed a centralized social media analytics dashboard that aggregates and visualizes data from multiple platforms in real-time. Built backend APIs to perform data aggregation, filtering, and time-series analysis. Designed dynamic dashboards showing posts, likes, comments, and engagement metrics.",
+    tech: ["React", "Next.js", "FastAPI", "SQLAlchemy", "PostgreSQL", "Chart.js", "JWT Auth", "ReportLab"],
+    category: "Full Stack / Data",
+    impact: "Real-time Multi-Platform Aggregation",
+    link: "https://github.com/tirthpatel143"
+  },
+  {
+    title: "SmartIn - Smart Voice Assistant",
+    description: "Developed a smart voice assistant application using Python capable of understanding and executing voice commands. The assistant uses SpeechRecognition and PyAudio to convert voice to text and respond. Optimized audio capture using PyAudio to ensure high-accuracy voice command parsing and low-latency response times.",
+    tech: ["Python", "SpeechRecognition", "PyAudio", "pyttsx3", "Wikipedia API", "smtplib"],
+    category: "Voice & Utility",
+    impact: "Low-latency audio command capture",
+    link: "https://github.com/tirthpatel143"
+  }
+];
+
+// Skills Data
+const skillCategories = [
+  {
+    title: "AI & Machine Learning",
+    icon: <Sparkles size={20} className="text-gradient" />,
+    skills: ["LangChain", "LlamaIndex", "RAG Systems", "Hermes Agent Framework", "Prompt Engineering", "OpenAI & OpenRouter APIs", "OpenCV", "Scikit-Learn"]
+  },
+  {
+    title: "Backend & Databases",
+    icon: <Database size={20} className="text-gradient" />,
+    skills: ["Python", "SQL", "FastAPI", "Flask", "PostgreSQL (pgvector)", "MySQL", "Qdrant Vector DB", "Faiss Indexing"]
+  },
+  {
+    title: "Tools & Libraries",
+    icon: <Cpu size={20} className="text-gradient" />,
+    skills: ["N8N", "MeiliSearch", "Docker", "Git / GitHub", "Power BI", "Google Analytics 4", "Pandas", "NumPy", "Seaborn", "Matplotlib"]
+  },
+  {
+    title: "Web Technologies",
+    icon: <Globe size={20} className="text-gradient" />,
+    skills: ["HTML5", "CSS3", "JavaScript", "TypeScript", "Next.js", "React", "Vanilla CSS", "Tailwind CSS"]
+  }
+];
+
+// Timeline Data
+const timelineData = [
+  {
+    type: "experience",
+    title: "AI/ML Intern",
+    organization: "The Special Character (On Site)",
+    date: "Dec 2025 - Present",
+    description: "Developed a RAG-based document retrieval system using LangChain and PostgreSQL (pgvector), improving information retrieval speed drastically and compared to traditional manual keyword searching.",
+    location: "Gandhinagar, India"
+  },
+  {
+    type: "experience",
+    title: "Data Science Trainee",
+    organization: "Zidio Development (Online)",
+    date: "15 June 2025 – 15 July 2025",
+    description: "Strengthened core Python programming skills through real-world assignments. Cleaned, aggregated, and visualized complex data models using Seaborn, Pandas, and Matplotlib.",
+    location: "Remote"
+  },
+  {
+    type: "education",
+    title: "B.E. in Information Technology",
+    organization: "LDRP Institute of Technology and Research",
+    date: "Aug 2022 – May 2026",
+    description: "CGPA: 8.27 / 10 (Till 7th Semester). Relevant Coursework: Cyber Security, Object Oriented Programming, DBMS, Discrete-Maths, Data Structures and Algorithms, Operating Systems, Computer Networks, Machine Learning, Computer Organization, Soft-Computing, Artificial Intelligence.",
+    location: "Gandhinagar, Gujarat"
+  },
+  {
+    type: "education",
+    title: "12-Science",
+    organization: "P.P.G Experimental High School",
+    date: "May 2021 – May 2022",
+    description: "Completed higher secondary education in Science stream with a strong focus on mathematics and analytical reasoning. Score: 60%.",
+    location: "Gujarat, India"
+  }
+];
 
 export default function Home() {
-  const [terminalLines, setTerminalLines] = useState<string[]>([
-    "Initializing Nous Hermes Terminal environment...",
-    "Loading LLM provider: openrouter/google/gemini-2.5-flash:free...",
-    "Ready. Type a command or click one of the quick actions below.",
-    "Type 'help' to see available commands."
+  const [activeCategory, setActiveCategory] = useState("All");
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [terminalHistory, setTerminalHistory] = useState<Array<{ type: 'input' | 'output' | 'success' | 'error'; text: string }>>([
+    { type: 'output', text: 'Welcome to Tirth Patel OS v1.0.0.' },
+    { type: 'output', text: 'Type "help" to see all available commands.' }
   ]);
-  const [inputValue, setInputValue] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
+  const [terminalInput, setTerminalInput] = useState('');
+  
+  // Contact Form State
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [formStatus, setFormStatus] = useState<'idle' | 'sending' | 'success'>('idle');
+
   const terminalEndRef = useRef<HTMLDivElement>(null);
 
-  const handleCommand = async (cmd: string) => {
-    if (!cmd.trim() || isTyping) return;
-    setIsTyping(true);
-    
-    // Add command to terminal
-    setTerminalLines(prev => [...prev, `tirthdev@macos ~ % ${cmd}`]);
-    setInputValue("");
-    
-    // Auto-scroll
+  // Monitor scrolling to style navigation bar
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  // Auto-scroll terminal to bottom
+  useEffect(() => {
+    if (terminalEndRef.current) {
+      terminalEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [terminalHistory]);
+
+  // Terminal commands handling
+  const handleTerminalSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!terminalInput.trim()) return;
+
+    const inputCmd = terminalInput.trim().toLowerCase();
+    const newHistory = [...terminalHistory, { type: 'input' as const, text: `$ ${terminalInput}` }];
+
+    switch (inputCmd) {
+      case 'help':
+        newHistory.push(
+          { type: 'output', text: 'Available commands:' },
+          { type: 'success', text: '  about      - Display background bio' },
+          { type: 'success', text: '  skills     - List full technical arsenal' },
+          { type: 'success', text: '  projects   - Show core production projects' },
+          { type: 'success', text: '  contact    - Print direct communications' },
+          { type: 'success', text: '  hermes     - Trigger SEO Swarm agent simulation' },
+          { type: 'success', text: '  clear      - Clear the console history' }
+        );
+        break;
+      case 'about':
+        newHistory.push({
+          type: 'output',
+          text: 'Tirth Patel | AI/ML Architect & Full Stack developer specializing in RAG systems, vector search optimization, and autonomous multi-agent pipelines. Currently in Gandhinagar, Gujarat.'
+        });
+        break;
+      case 'skills':
+        newHistory.push(
+          { type: 'output', text: '💡 Core Skills Mapping:' },
+          { type: 'success', text: '  - AI Frameworks: LangChain, LlamaIndex, Qdrant Vector DB, Faiss' },
+          { type: 'success', text: '  - Languages: Python, SQL, Javascript, TypeScript' },
+          { type: 'success', text: '  - Backends: FastAPI, Flask, PostgreSQL' },
+          { type: 'success', text: '  - Frontend: Next.js, React, CSS, HTML5' }
+        );
+        break;
+      case 'projects':
+        newHistory.push(
+          { type: 'output', text: '🎯 Active Production Projects:' },
+          { type: 'success', text: '  1. Yogateria - RAG chatbot serving live Medusa product catalogs' },
+          { type: 'success', text: '  2. SEO-Improve - Hermes framework agent automating web content audit' },
+          { type: 'success', text: '  3. Nexus - Full-stack Stock Forecasting (ARIMA / LSTM models)' },
+          { type: 'success', text: '  4. Social Media Analytics - Multi-platform real-time visualizer' },
+          { type: 'success', text: '  5. SmartIn - Speech recognition voice assistant' }
+        );
+        break;
+      case 'contact':
+        newHistory.push(
+          { type: 'output', text: '📧 Direct connection coordinates:' },
+          { type: 'success', text: '  - Email: tirth.p.patel143@gmail.com' },
+          { type: 'success', text: '  - Phone: +91 6353782035' },
+          { type: 'success', text: '  - GitHub: github.com/tirthpatel143' },
+          { type: 'success', text: '  - LinkedIn: linkedin.com/in/tirthpatel143' }
+        );
+        break;
+      case 'clear':
+        setTerminalHistory([]);
+        setTerminalInput('');
+        return;
+      case 'hermes':
+        newHistory.push(
+          { type: 'output', text: '🤖 Initializing Hermes SEO Swarm [17 Agents]...' },
+          { type: 'success', text: '  [SYSTEM] Connected to OpenRouter API (model: owl-alpha)' },
+          { type: 'output', text: '  [Agent: Keyword Analyst] Crawling search density...' },
+          { type: 'output', text: '  [Agent: SEO Auditor] Scanned index state: 500+ URLs parsed.' },
+          { type: 'success', text: '  [SYSTEM] Audit Complete. Strategy assets uploaded. Execution: BLOCKED cleared!' }
+        );
+        break;
+      default:
+        newHistory.push({
+          type: 'error',
+          text: `Command not found: "${terminalInput}". Type "help" to see available options.`
+        });
+    }
+
+    setTerminalHistory(newHistory);
+    setTerminalInput('');
+  };
+
+  // Filter projects by category
+  const filteredProjects = useMemo(() => {
+    if (activeCategory === "All") return projectsData;
+    return projectsData.filter(p => p.category.includes(activeCategory) || p.tech.some(t => t.toLowerCase() === activeCategory.toLowerCase()));
+  }, [activeCategory]);
+
+  const handleContactSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.name || !formData.email || !formData.message) return;
+
+    setFormStatus('sending');
     setTimeout(() => {
-      terminalEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }, 50);
-
-    // Simulate thinking delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    const lowerCmd = cmd.toLowerCase().trim();
-    let responseLines: string[] = [];
-
-    if (lowerCmd === "help" || lowerCmd === "/help") {
-      responseLines = [
-        "🤖 Nous Hermes - Available commands:",
-        "  /xurl           - Initialize xurl skill & verify X API credentials",
-        "  whoami          - Query current authenticated X handle details",
-        "  post [text]     - Draft and post a new update to X via Free API",
-        "  bookmarks       - Fetch and ingest user bookmarks (Free fallback enabled)",
-        "  help            - View this instructions panel",
-        "  clear           - Wipe the terminal output clean"
-      ];
-    } else if (lowerCmd === "clear") {
-      setTerminalLines([]);
-      setIsTyping(false);
-      return;
-    } else if (lowerCmd === "/xurl") {
-      responseLines = [
-        "⚡ Loading X-Agent skill: xurl...",
-        "⚙️ Scanning PATH for xurl executable...",
-        "   ✓ Found xurl CLI at ~/.local/bin/xurl (v1.2.0)",
-        "🔑 Validating X developer application credentials...",
-        "   ✓ App Name: 'my-portfolio-app'",
-        "   ✓ Client ID: 817f39...0a1h (Free Tier Write-Only)",
-        "📡 Establishing OAuth 2.0 Handshake...",
-        "   ✓ Tokens verified (stored in ~/.hermes/auth.json)",
-        "👤 Authenticated as X user: @tirthdev",
-        "",
-        "✓ X-Agent skill loaded. You are ready to tweet & interact conversationally for $0!"
-      ];
-    } else if (lowerCmd === "whoami") {
-      responseLines = [
-        "📡 Running: xurl whoami",
-        "-------------------------------------------------------",
-        "  Authorized X Username : @tirthdev",
-        "  Client Application    : my-portfolio-app",
-        "  OAuth 2.0 Scopes      : tweet.read, tweet.write, users.read",
-        "  Active API Plan       : Free Tier ($0/month Limit)",
-        "  Daily Limits          : 50 posts/day max (1,500/month)",
-        "  Connectivity Status   : HEALTHY (200 OK)",
-        "-------------------------------------------------------"
-      ];
-    } else if (lowerCmd.startsWith("post ")) {
-      const tweetText = cmd.slice(5).replace(/^['"]|['"]$/g, "");
-      responseLines = [
-        "🧠 Intent Detected: Post text update to X (Twitter)",
-        `📝 Content: "${tweetText}"`,
-        "📋 Planning steps:",
-        "  1. Verify tweet length (less than 280 chars)",
-        "  2. Invoke xurl CLI: xurl post [content]",
-        "  3. Monitor JSON callback for tweet ID & URL",
-        "",
-        "🚀 Executing: xurl post \"mock_payload\"...",
-        "   Sending payload to api.twitter.com/2/tweets...",
-        "   ✓ API 201 Created response received!",
-        "",
-        "🎉 SUCCESS! Posted to X for $0.00!",
-        "-------------------------------------------------------",
-        "  Tweet ID  : 2047107136023650625",
-        "  Author    : @tirthdev",
-        `  Text      : "${tweetText}"`,
-        `  Link      : https://x.com/tirthdev/status/2047107136023650625`,
-        "-------------------------------------------------------"
-      ];
-    } else if (lowerCmd === "bookmarks") {
-      responseLines = [
-        "🧠 Intent Detected: Retrieve bookmarks",
-        "📡 Executing: xurl bookmarks -n 5...",
-        "",
-        "⚠️ X API Free Tier limitation encountered: endpoint requires Basic Tier ($100/mo).",
-        "💡 Smart fallback activated: Ingesting local bookmarks database (bookmarks.json)...",
-        "",
-        "📂 Found 3 bookmarks cached in Hermes memory:",
-        "  1. [@nousresearch] 'Nous Hermes 1.0 terminal agent is officially released!' (Tools, planning, execution in your terminal)",
-        "  2. [@karpathy] 'AI agents running on your local shell represent a major UX shift. Standard APIs meet raw bash capability.'",
-        "  3. [@xdevplatform] 'xurl CLI tool makes OAuth 2.0 scripting for X incredibly easy...'"
-      ];
-    } else {
-      responseLines = [
-        `🧠 Nous Hermes is thinking... input: "${cmd}"`,
-        "🤖 Response:",
-        `  \"I recognized your custom prompt! To interact with the X API, please try:`,
-        `   - '/xurl' to initialize the skill`,
-        `   - 'whoami' to view credential details`,
-        `   - 'post \"[your message]\"' to post to X for free!\"`
-      ];
-    }
-
-    // Print lines with minor typing delay
-    for (let i = 0; i < responseLines.length; i++) {
-      await new Promise(resolve => setTimeout(resolve, 80));
-      setTerminalLines(prev => [...prev, responseLines[i]]);
-      setTimeout(() => {
-        terminalEndRef.current?.scrollIntoView({ behavior: "smooth" });
-      }, 20);
-    }
-    
-    setIsTyping(false);
-  };
-
-  const clickSuggestion = (text: string) => {
-    if (isTyping) return;
-    setInputValue(text);
-    handleCommand(text);
-  };
-
-  const skillCategories = [
-    {
-      title: "Intelligence & Backend",
-      icon: <Sparkles className="text-gradient" size={20} />,
-      skills: ["FastAPI", "Python", "Node.js", "LangChain", "OpenAI API", "PostgreSQL", "Redis"]
-    },
-    {
-      title: "Frontend Excellence",
-      icon: <Layers className="text-gradient" size={20} />,
-      skills: ["Next.js 15", "React", "TypeScript", "Tailwind CSS", "Framer Motion", "GSAP"]
-    },
-    {
-      title: "DevOps & Cloud",
-      icon: <Database className="text-gradient" size={20} />,
-      skills: ["Docker", "AWS", "CI/CD", "Vercel", "Linux", "GraphQL"]
-    }
-  ];
-
-  const projects = [
-    {
-      title: "Hermes SEO Swarm",
-      description: "Built an autonomous multi-agent system that automated SEO auditing for 500+ pages, reducing manual workload by 90%.",
-      tech: ["Python", "OpenAI", "Next.js"],
-      impact: "90% Efficiency Increase",
-      link: "#"
-    },
-    {
-      title: "Stock Time Nexus",
-      description: "Real-time stock analysis platform processing 10k+ data points per second with 98% prediction accuracy on market trends.",
-      tech: ["FastAPI", "React", "yfinance"],
-      impact: "98% Accuracy Rate",
-      link: "#"
-    },
-    {
-      title: "Hermes X-Agent (xurl)",
-      description: "Connected Nous Hermes to X (Twitter) using OAuth 2.0 and xurl CLI, enabling conversational posting and bookmark ingestion at $0.",
-      tech: ["Nous Hermes", "xurl CLI", "OAuth 2.0", "Next.js"],
-      impact: "100% Free Autonomous Posting",
-      link: "#hermes-demo"
-    },
-    {
-      title: "Aura AI Dashboard",
-      description: "Premium glassmorphic interface for monitoring swarm health, used to manage 17+ autonomous agents in real-time.",
-      tech: ["Next.js", "Chart.js", "Lucide"],
-      impact: "Real-time Orchestration",
-      link: "#"
-    }
-  ];
-
-  const fadeInUp = {
-    initial: { opacity: 0, y: 30 },
-    whileInView: { opacity: 1, y: 0 },
-    viewport: { once: true },
-    transition: { duration: 0.6 }
+      setFormStatus('success');
+      setFormData({ name: '', email: '', message: '' });
+      setTimeout(() => setFormStatus('idle'), 6000);
+    }, 1500);
   };
 
   return (
     <main style={{ position: 'relative' }}>
-      {/* Animated Orbs */}
+      {/* Animated Floating Glow Orbs */}
       <div className="orb orb-primary"></div>
       <div className="orb orb-secondary"></div>
+      <div className="orb orb-accent"></div>
 
-      {/* Navbar */}
-      <nav className="nav glass">
+      {/* Cyber Grid Header / Nav */}
+      <nav className={`nav ${isScrolled ? 'scrolled' : ''}`}>
         <div className="container flex" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
-          <div className="flex-center" style={{ gap: '0.5rem' }}>
-            <Terminal size={22} className="text-gradient" />
-            <span style={{ fontWeight: 800, fontSize: '1.1rem', letterSpacing: '-0.5px' }}>TP.DEV</span>
+          <div className="flex" style={{ alignItems: 'center', gap: '0.6rem' }}>
+            <Terminal size={22} className="text-gradient" style={{ animationDuration: '3s' }} />
+            <span style={{ fontWeight: 800, fontSize: '1.25rem', letterSpacing: '-0.5px', fontFamily: 'var(--font-display)' }}>
+              TIRTH<span className="text-gradient">.DEV</span>
+            </span>
           </div>
-          <div className="flex nav-links" style={{ gap: '2rem' }}>
-            <a href="#about" style={{ fontWeight: 500 }}>About</a>
-            <a href="#projects" style={{ fontWeight: 500 }}>Projects</a>
-            <a href="#contact" className="btn btn-primary" style={{ padding: '0.5rem 1.2rem', fontSize: '0.9rem' }}>Hire Me</a>
+          <div className="flex nav-links" style={{ gap: '2rem', alignItems: 'center' }}>
+            <a href="#about" style={{ fontWeight: 500, fontSize: '0.95rem', color: '#a1a1aa', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#00f0ff'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>About</a>
+            <a href="#projects" style={{ fontWeight: 500, fontSize: '0.95rem', color: '#a1a1aa', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#00f0ff'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>Projects</a>
+            <a href="#skills" style={{ fontWeight: 500, fontSize: '0.95rem', color: '#a1a1aa', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#00f0ff'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>Skills</a>
+            <a href="#timeline" style={{ fontWeight: 500, fontSize: '0.95rem', color: '#a1a1aa', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#00f0ff'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>Experience</a>
+            <a href="#contact" className="btn btn-primary" style={{ padding: '0.5rem 1.2rem', fontSize: '0.85rem', borderRadius: '10px' }}>
+              Say Hello
+            </a>
           </div>
         </div>
       </nav>
 
       {/* Hero Section */}
-      <section className="hero">
-        <div className="hero-bg"></div>
+      <section className="hero" id="about">
         <div className="hero-overlay"></div>
-        <div className="container">
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8 }}
-            style={{ textAlign: 'center', maxWidth: '1000px', margin: '0 auto' }}
-          >
-            <div className="flex-center" style={{ marginBottom: '2rem' }}>
-              <span className="tag animate-float" style={{ background: 'rgba(59, 130, 246, 0.1)', borderColor: 'rgba(59, 130, 246, 0.3)', color: '#60a5fa', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <span style={{ width: '8px', height: '8px', background: '#10b981', borderRadius: '50%', display: 'inline-block' }}></span>
-                Available for New Challenges
-              </span>
-            </div>
-            <h1 style={{ fontSize: '5rem', lineHeight: 1, fontWeight: 900, marginBottom: '2rem', letterSpacing: '-3px' }}>
-              I Build <span className="text-gradient">Autonomous Systems</span> <br /> 
-              & High-Impact User Experiences.
-            </h1>
-            <p style={{ fontSize: '1.4rem', color: '#a1a1aa', maxWidth: '750px', margin: '0 auto 3.5rem', lineHeight: 1.6 }}>
-              Software Engineer & AI Architect specializing in bridging complex 
-              intelligence with world-class design. Turning ideas into scalable reality.
-            </p>
-            <div className="flex-center" style={{ gap: '1.5rem', flexWrap: 'wrap' }}>
-              <motion.a 
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                href="#projects" 
-                className="btn btn-primary" 
-                style={{ fontSize: '1.1rem' }}
-              >
-                View Portfolio <ChevronRight size={20} />
-              </motion.a>
-              <motion.a 
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                href="#contact" 
-                className="btn btn-outline" 
-                style={{ fontSize: '1.1rem' }}
-              >
-                Get in Touch
-              </motion.a>
-            </div>
-          </motion.div>
-        </div>
-      </section>
-
-      {/* Social Proof / Stats */}
-      <section style={{ padding: '2rem 0', background: 'rgba(255,255,255,0.02)', borderTop: '1px solid var(--glass-border)', borderBottom: '1px solid var(--glass-border)' }}>
-        <div className="container flex-center" style={{ gap: '4rem', flexWrap: 'wrap' }}>
-          {[
-            { label: "Years Exp.", value: "5+" },
-            { label: "Projects Delivered", value: "50+" },
-            { label: "Lines of Code", value: "100k+" }
-          ].map((stat, i) => (
-            <motion.div 
-              key={i}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-              viewport={{ once: true }}
-              style={{ textAlign: 'center' }}
+        <div className="container" style={{ width: '100%' }}>
+          <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', alignItems: 'center', gap: '3.5rem', width: '100%' }}>
+            
+            {/* Left Copy */}
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
             >
-               <h3 style={{ fontSize: '2.5rem', fontWeight: 800 }} className="text-gradient">{stat.value}</h3>
-               <p style={{ color: '#71717a', fontSize: '0.9rem', fontWeight: 600 }}>{stat.label}</p>
+              <div className="flex" style={{ marginBottom: '1.5rem' }}>
+                <span className="tag animate-float" style={{ background: 'rgba(0, 240, 255, 0.08)', borderColor: 'rgba(0, 240, 255, 0.25)', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <span style={{ width: '8px', height: '8px', background: '#10b981', borderRadius: '50%', display: 'inline-block', boxShadow: '0 0 8px #10b981' }}></span>
+                  Open to Opportunities | AI/ML Architect
+                </span>
+              </div>
+              <h1 style={{ fontSize: '4rem', lineHeight: 1.05, fontWeight: 900, marginBottom: '1.5rem', fontFamily: 'var(--font-display)', letterSpacing: '-2px' }}>
+                I Architect <span className="text-gradient">Autonomous Agents</span> & Intelligence Hubs.
+              </h1>
+              <p style={{ fontSize: '1.2rem', color: '#a1a1aa', maxWidth: '600px', marginBottom: '2.5rem', lineHeight: 1.6 }}>
+                Hi, I'm Tirth Patel. I design high-throughput Retrieval-Augmented Generation (RAG) environments, neural vector stores, and custom LLM workflows that automate complex tasks and visualize insights instantly.
+              </p>
+              
+              <div className="flex" style={{ gap: '1rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
+                <a href="#projects" className="btn btn-primary">
+                  Explore Work <ArrowRight size={18} />
+                </a>
+                <a href="#contact" className="btn btn-outline">
+                  Contact Coordinates
+                </a>
+              </div>
+
+              <div className="flex" style={{ gap: '2rem', flexWrap: 'wrap' }}>
+                <div className="flex" style={{ alignItems: 'center', gap: '0.5rem', color: '#71717a' }}>
+                  <MapPin size={16} className="text-gradient" />
+                  <span style={{ fontSize: '0.9rem' }}>Gandhinagar, Gujarat</span>
+                </div>
+                <div className="flex" style={{ alignItems: 'center', gap: '0.5rem', color: '#71717a' }}>
+                  <Mail size={16} className="text-gradient" />
+                  <span style={{ fontSize: '0.9rem' }}>tirth.p.patel143@gmail.com</span>
+                </div>
+              </div>
             </motion.div>
-          ))}
+
+            {/* Right Interactive CLI Terminal */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
+              <div className="terminal-window">
+                <div className="terminal-header">
+                  <div className="terminal-dots">
+                    <span className="terminal-dot dot-red"></span>
+                    <span className="terminal-dot dot-yellow"></span>
+                    <span className="terminal-dot dot-green"></span>
+                  </div>
+                  <span className="terminal-title">tirth@agent-host: ~</span>
+                  <div style={{ width: '38px' }}></div>
+                </div>
+                <div className="terminal-body">
+                  {terminalHistory.map((line, idx) => (
+                    <div 
+                      key={idx} 
+                      className="terminal-output" 
+                      style={{ 
+                        color: line.type === 'error' ? '#f87171' : 
+                               line.type === 'success' ? 'var(--primary)' : 
+                               line.type === 'input' ? '#ffffff' : '#a1a1aa'
+                      }}
+                    >
+                      {line.text}
+                    </div>
+                  ))}
+                  <div ref={terminalEndRef}></div>
+                </div>
+                <form onSubmit={handleTerminalSubmit} className="terminal-header" style={{ background: '#0a0a0f', borderTop: '1px solid rgba(255,255,255,0.03)', padding: '0.5rem 1rem' }}>
+                  <div className="terminal-input-line" style={{ width: '100%' }}>
+                    <span className="terminal-prompt">&gt;</span>
+                    <input 
+                      type="text" 
+                      className="terminal-text-input" 
+                      placeholder="Type a command (e.g. 'help', 'skills', 'hermes')..."
+                      value={terminalInput}
+                      onChange={(e) => setTerminalInput(e.target.value)}
+                    />
+                  </div>
+                </form>
+              </div>
+            </motion.div>
+
+          </div>
         </div>
       </section>
 
-      {/* Projects Section */}
-      <section id="projects" className="section">
+      {/* Metrics Bar */}
+      <section style={{ padding: '3.5rem 0', background: 'rgba(255,255,255,0.01)', borderTop: '1px solid var(--glass-border)', borderBottom: '1px solid var(--glass-border)' }}>
         <div className="container">
-          <motion.div 
-            {...fadeInUp}
-            className="flex" 
-            style={{ justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '4rem' }}
-          >
-            <div>
-              <h2 style={{ fontSize: '3.5rem', fontWeight: 800 }}>Featured <span className="text-gradient">Work</span></h2>
-              <p style={{ color: '#a1a1aa', fontSize: '1.1rem' }}>Proven results across AI, FinTech, and SEO.</p>
-            </div>
-            <a href="#" className="flex" style={{ alignItems: 'center', gap: '0.5rem', color: '#3b82f6', fontWeight: 600 }}>
-              See all projects <ExternalLink size={16} />
-            </a>
-          </motion.div>
-          
-          <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2.5rem' }}>
-            {projects.map((project, i) => (
-              <motion.div 
+          <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '3rem', textAlign: 'center' }}>
+            {[
+              { value: "98%", label: "Stock Forecasting Accuracy", desc: "Using ARIMA, Prophet, LSTM" },
+              { value: "0", label: "Hallucination Recommendations", desc: "RAG ground Medusa e-com" },
+              { value: "95%", label: "SEO Audit Automation", desc: "Hermes autonomous agents swarm" },
+              { value: "8.27", label: "CGPA (Till 7th Sem)", desc: "LDRP IT B.E. Degree" }
+            ].map((metric, i) => (
+              <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 30 }}
+                initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.2 }}
+                transition={{ delay: i * 0.1, duration: 0.5 }}
                 viewport={{ once: true }}
-                className="glass-card" 
-                style={{ padding: '2.5rem', position: 'relative' }}
               >
-                <div style={{ position: 'absolute', top: '1.5rem', right: '1.5rem' }}>
-                  <span className="tag" style={{ fontSize: '0.7rem', background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' }}>
-                    {project.impact}
-                  </span>
-                </div>
-                <Rocket className="text-gradient" size={32} style={{ marginBottom: '1.5rem' }} />
-                <h3 style={{ fontSize: '1.8rem', marginBottom: '1rem', fontWeight: 800 }}>{project.title}</h3>
-                <p style={{ color: '#a1a1aa', marginBottom: '2rem', lineHeight: 1.6, fontSize: '1.05rem' }}>{project.description}</p>
-                <div className="flex" style={{ gap: '0.6rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
-                  {project.tech.map(t => <span key={t} className="tag" style={{ fontSize: '0.75rem' }}>{t}</span>)}
-                </div>
-                <a href={project.link} className="btn btn-outline" style={{ width: '100%', justifyContent: 'center' }}>
-                  View Case Study
-                </a>
+                <h3 style={{ fontSize: '3rem', fontWeight: 900, marginBottom: '0.3rem', fontFamily: 'var(--font-display)' }} className="text-gradient">
+                  {metric.value}
+                </h3>
+                <h4 style={{ color: '#f3f4f6', fontSize: '1rem', fontWeight: 700, marginBottom: '0.2rem' }}>
+                  {metric.label}
+                </h4>
+                <p style={{ color: '#71717a', fontSize: '0.8rem' }}>
+                  {metric.desc}
+                </p>
               </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Hermes Interactive Playground */}
-      <section id="hermes-demo" className="section" style={{ background: 'linear-gradient(180deg, rgba(10,10,10,0) 0%, rgba(59,130,246,0.03) 50%, rgba(10,10,10,0) 100%)', position: 'relative', overflow: 'hidden' }}>
-        {/* Decorative Grid Background */}
-        <div style={{ position: 'absolute', inset: 0, backgroundImage: 'linear-gradient(rgba(255,255,255,0.01) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.01) 1px, transparent 1px)', backgroundSize: '40px 40px', zIndex: -1 }}></div>
-        
+      {/* Projects Matrix Section */}
+      <section className="section" id="projects">
         <div className="container">
-          <div style={{ textAlign: 'center', maxWidth: '800px', margin: '0 auto 4rem' }}>
-            <span className="tag animate-float" style={{ background: 'rgba(168, 85, 247, 0.1)', borderColor: 'rgba(168, 85, 247, 0.3)', color: '#d8b4fe', marginBottom: '1.5rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
-              <Cpu size={16} /> Live Simulation
-            </span>
-            <h2 style={{ fontSize: '3.5rem', fontWeight: 800, marginBottom: '1.5rem', letterSpacing: '-2px' }}>
-              Nous Hermes <span className="text-gradient">X-Agent Terminal</span>
+          <div className="flex" style={{ flexDirection: 'column', alignItems: 'center', marginBottom: '4rem', textAlign: 'center' }}>
+            <h2 style={{ fontSize: '3rem', fontWeight: 800, marginBottom: '1rem' }}>
+              Featured <span className="text-gradient">Agentic Work</span>
             </h2>
-            <p style={{ color: '#a1a1aa', fontSize: '1.2rem', lineHeight: 1.6 }}>
-              Experience how my autonomous terminal agent connects to the X API using <strong>xurl</strong>, OAuth 2.0, and OpenRouter free-tier LLMs for a <strong>$0 setup cost</strong>.
+            <p style={{ color: '#a1a1aa', fontSize: '1.1rem', maxWidth: '600px', marginBottom: '2.5rem' }}>
+              A curated look into my production chatbots, automated search engine optimization crawlers, and data systems.
             </p>
-          </div>
 
-          <div className="grid" style={{ gridTemplateColumns: '1fr', gap: '3rem', maxWidth: '950px', margin: '0 auto' }}>
-            {/* Terminal Mockup */}
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="glass-card" 
-              style={{ 
-                padding: '0', 
-                overflow: 'hidden', 
-                border: '1px solid rgba(59, 130, 246, 0.2)',
-                boxShadow: '0 25px 50px -12px rgba(59, 130, 246, 0.15)',
-                display: 'flex',
-                flexDirection: 'column',
-                borderRadius: '16px'
-              }}
-            >
-              {/* Terminal Header */}
-              <div style={{ 
-                background: 'rgba(255, 255, 255, 0.03)', 
-                borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
-                padding: '0.8rem 1.2rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between'
-              }}>
-                <div className="flex" style={{ gap: '0.5rem' }}>
-                  <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#ef4444', display: 'block' }}></span>
-                  <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#eab308', display: 'block' }}></span>
-                  <span style={{ width: '12px', height: '12px', borderRadius: '50%', background: '#22c55e', display: 'block' }}></span>
-                </div>
-                <div style={{ fontSize: '0.8rem', color: '#71717a', fontFamily: 'monospace', fontWeight: 600 }}>
-                  hermes-xurl-agent ~ bash
-                </div>
-                <div style={{ width: '48px' }}></div>
-              </div>
-
-              {/* Terminal Screen */}
-              <div style={{ 
-                background: '#070a13', 
-                color: '#34d399', 
-                fontFamily: 'Courier New, Courier, monospace', 
-                padding: '1.5rem', 
-                height: '400px', 
-                overflowY: 'auto',
-                fontSize: '0.95rem',
-                lineHeight: 1.5,
-                borderBottom: '1px solid rgba(255, 255, 255, 0.05)'
-              }}>
-                {terminalLines.map((line, idx) => {
-                  let style: React.CSSProperties = { whiteSpace: 'pre-wrap', marginBottom: '0.4rem' };
-                  if (line.startsWith("tirthdev@macos")) {
-                    style.color = '#60a5fa'; // Blue for prompt commands
-                    style.fontWeight = 'bold';
-                  } else if (line.startsWith("⚠️")) {
-                    style.color = '#fbbf24'; // Yellow for warnings
-                  } else if (line.startsWith("✓") || line.startsWith("🎉") || line.startsWith("SUCCESS")) {
-                    style.color = '#34d399'; // Green for successes
-                  } else if (line.startsWith("🧠") || line.startsWith("⚙️") || line.startsWith("📡") || line.startsWith("⚡")) {
-                    style.color = '#c084fc'; // Purple for logs / metadata
-                  } else if (line.startsWith("----------------")) {
-                    style.color = '#4b5563'; // Gray dividers
-                  } else if (line.includes("Authorized X") || line.includes("Tweet ID") || line.includes("Text") || line.includes("Link")) {
-                    style.color = '#e2e8f0'; // Off-white for credential values
-                  } else if (line.startsWith("Available commands")) {
-                    style.color = '#a1a1aa'; // Muted gray
-                  }
-                  
-                  return (
-                    <div key={idx} style={style}>
-                      {line}
-                    </div>
-                  );
-                })}
-                {isTyping && (
-                  <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem', color: '#a1a1aa', fontStyle: 'italic', marginTop: '0.5rem' }}>
-                    <RefreshCw size={14} className="animate-spin" /> Hermes is running skill pipelines...
-                  </div>
-                )}
-                <div ref={terminalEndRef} />
-              </div>
-
-              {/* Terminal Form Input */}
-              <form 
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleCommand(inputValue);
-                }}
-                style={{ 
-                  background: 'rgba(255, 255, 255, 0.01)', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  padding: '1rem 1.5rem',
-                  gap: '1rem'
-                }}
-              >
-                <span style={{ color: '#60a5fa', fontFamily: 'monospace', fontWeight: 'bold', fontSize: '1rem', whiteSpace: 'nowrap' }}>
-                  tirthdev@macos ~ %
-                </span>
-                <input 
-                  type="text" 
-                  value={inputValue}
-                  onChange={(e) => setInputValue(e.target.value)}
-                  disabled={isTyping}
-                  placeholder="Type a command (e.g. whoami, /xurl, post 'Hello World', bookmarks)..."
-                  style={{ 
-                    background: 'transparent', 
-                    border: 'none', 
-                    outline: 'none', 
-                    color: 'white', 
-                    fontFamily: 'monospace', 
-                    fontSize: '1rem',
-                    flex: 1,
-                    caretColor: '#3b82f6'
-                  }}
-                />
-                <button 
-                  type="submit" 
-                  disabled={isTyping || !inputValue.trim()}
-                  className="btn btn-primary" 
-                  style={{ 
-                    padding: '0.6rem 1.2rem', 
-                    borderRadius: '8px', 
-                    fontSize: '0.85rem',
-                    opacity: (isTyping || !inputValue.trim()) ? 0.5 : 1,
-                    cursor: (isTyping || !inputValue.trim()) ? 'not-allowed' : 'pointer'
-                  }}
+            {/* Filter Matrix Pills */}
+            <div className="flex" style={{ gap: '0.8rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+              {["All", "AI & Agents", "Data Science", "Voice & Utility"].map((cat) => (
+                <button
+                  key={cat}
+                  onClick={() => setActiveCategory(cat)}
+                  className={`skills-tab-btn ${activeCategory === cat ? 'active' : ''}`}
                 >
-                  Run <Send size={14} />
+                  {cat}
                 </button>
-              </form>
-            </motion.div>
-
-            {/* Quick Actions Panel */}
-            <div style={{ textAlign: 'center' }}>
-              <p style={{ color: '#71717a', fontSize: '0.95rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1.2rem' }}>
-                💡 Click a quick command to execute immediately:
-              </p>
-              <div className="flex-center" style={{ gap: '1rem', flexWrap: 'wrap' }}>
-                {[
-                  { label: "Initialize Skill", cmd: "/xurl" },
-                  { label: "Check Session", cmd: "whoami" },
-                  { label: "Post Free Tweet", cmd: 'post "Building autonomous agent pipelines for $0! 🤖"' },
-                  { label: "Fetch Bookmarks", cmd: "bookmarks" },
-                  { label: "Get Help Menu", cmd: "help" }
-                ].map((s, i) => (
-                  <button
-                    key={i}
-                    onClick={() => clickSuggestion(s.cmd)}
-                    disabled={isTyping}
-                    className="btn btn-outline"
-                    style={{ 
-                      fontSize: '0.85rem', 
-                      padding: '0.5rem 1.2rem', 
-                      borderRadius: '99px',
-                      fontFamily: 'monospace',
-                      background: 'rgba(255,255,255,0.02)',
-                      border: '1px solid rgba(255,255,255,0.06)',
-                      transition: 'all 0.2s',
-                      cursor: isTyping ? 'not-allowed' : 'pointer'
-                    }}
-                  >
-                    <Play size={10} className="text-gradient" /> {s.cmd.startsWith("post") ? "post" : s.cmd}
-                  </button>
-                ))}
-              </div>
+              ))}
             </div>
           </div>
+
+          {/* Projects Fluid Grid */}
+          <motion.div 
+            layout 
+            className="grid" 
+            style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '2.5rem' }}
+          >
+            <AnimatePresence mode="popLayout">
+              {filteredProjects.map((proj: Project, idx: number) => (
+                <motion.div
+                  layout
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.9 }}
+                  transition={{ duration: 0.4 }}
+                  key={proj.title}
+                  className="glass-card"
+                  style={{ padding: '2rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}
+                >
+                  <div>
+                    <div className="flex" style={{ justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
+                      <div style={{ padding: '0.8rem', background: 'rgba(255, 255, 255, 0.03)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                        {proj.category.includes("AI") ? (
+                          <Sparkles size={24} className="text-gradient" />
+                        ) : proj.category.includes("Data") ? (
+                          <Database size={24} style={{ color: 'var(--secondary)' }} />
+                        ) : (
+                          <Cpu size={24} style={{ color: 'var(--accent)' }} />
+                        )}
+                      </div>
+                      <span className="tag" style={{ fontSize: '0.7rem', background: 'rgba(16, 185, 129, 0.08)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.25)' }}>
+                        {proj.impact}
+                      </span>
+                    </div>
+
+                    <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '1rem', color: '#ffffff' }}>
+                      {proj.title}
+                    </h3>
+                    <p style={{ color: '#a1a1aa', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '1.5rem' }}>
+                      {proj.description}
+                    </p>
+                  </div>
+
+                  <div>
+                    <div className="flex" style={{ gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
+                      {proj.tech.map((t: string) => (
+                        <span key={t} className="tag" style={{ fontSize: '0.75rem', padding: '0.2rem 0.8rem' }}>
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+
+                    <a 
+                      href={proj.link} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className="btn btn-outline" 
+                      style={{ width: '100%', justifyContent: 'center', padding: '0.7rem 1rem', fontSize: '0.9rem' }}
+                    >
+                      View Source Code <ExternalLink size={14} />
+                    </a>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </motion.div>
         </div>
       </section>
 
-      {/* Skills Section - Categorized */}
-      <section id="skills" className="section" style={{ background: 'rgba(255,255,255,0.01)' }}>
+      {/* Skills Matrix Section */}
+      <section className="section" id="skills" style={{ background: 'rgba(3, 3, 5, 0.5)' }}>
         <div className="container">
-          <motion.h2 
-            {...fadeInUp}
-            style={{ fontSize: '3rem', fontWeight: 800, marginBottom: '4rem', textAlign: 'center' }}
-          >
-            Technical <span className="text-gradient">Arsenal</span>
-          </motion.h2>
-          <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
-            {skillCategories.map((cat, idx) => (
-              <motion.div 
-                key={idx} 
-                initial={{ opacity: 0, x: idx % 2 === 0 ? -20 : 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
+          <div className="flex" style={{ flexDirection: 'column', alignItems: 'center', marginBottom: '4rem', textAlign: 'center' }}>
+            <h2 style={{ fontSize: '3rem', fontWeight: 800, marginBottom: '1rem' }}>
+              Technical <span className="text-gradient">Arsenal</span>
+            </h2>
+            <p style={{ color: '#a1a1aa', fontSize: '1.1rem', maxWidth: '600px' }}>
+              My engineering stack spanning Agent frameworks, core mathematical modeling, and enterprise databases.
+            </p>
+          </div>
+
+          <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '2rem' }}>
+            {skillCategories.map((cat, i) => (
+              <motion.div
+                key={cat.title}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                className="glass-card" 
-                style={{ padding: '2.5rem' }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="glass-card"
+                style={{ padding: '2rem' }}
               >
-                <div className="flex" style={{ alignItems: 'center', gap: '1rem', marginBottom: '2rem' }}>
-                   <div style={{ padding: '0.8rem', background: 'rgba(255,255,255,0.05)', borderRadius: '12px' }}>
-                      {cat.icon}
-                   </div>
-                   <h3 style={{ fontSize: '1.4rem', fontWeight: 700 }}>{cat.title}</h3>
+                <div className="flex" style={{ alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
+                  <div style={{ padding: '0.6rem', background: 'rgba(255, 255, 255, 0.03)', borderRadius: '10px' }}>
+                    {cat.icon}
+                  </div>
+                  <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>{cat.title}</h3>
                 </div>
-                <div className="flex" style={{ flexWrap: 'wrap', gap: '0.8rem' }}>
-                  {cat.skills.map(skill => (
-                    <motion.span 
-                      whileHover={{ scale: 1.1, backgroundColor: 'rgba(59, 130, 246, 0.1)' }}
-                      key={skill} 
-                      className="tag" 
-                      style={{ fontWeight: 600, cursor: 'default' }}
+                <div className="flex" style={{ flexWrap: 'wrap', gap: '0.6rem' }}>
+                  {cat.skills.map((skill) => (
+                    <motion.span
+                      whileHover={{ scale: 1.05, borderColor: 'var(--primary)', color: 'var(--primary)' }}
+                      key={skill}
+                      className="tag"
+                      style={{ cursor: 'default', fontWeight: 500, fontSize: '0.8rem' }}
                     >
                       {skill}
                     </motion.span>
@@ -573,70 +585,291 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Testimonial / Trust */}
-      <section className="section">
+      {/* Experience & Education timeline */}
+      <section className="section" id="timeline">
         <div className="container">
-           <motion.div 
-            {...fadeInUp}
-            className="glass-card" 
-            style={{ padding: '4rem', textAlign: 'center', maxWidth: '900px', margin: '0 auto' }}
-           >
-              <Star className="text-gradient" size={40} style={{ marginBottom: '2rem', margin: '0 auto' }} />
-              <p style={{ fontSize: '1.8rem', fontWeight: 500, lineHeight: 1.5, marginBottom: '2.5rem', fontStyle: 'italic' }}>
-                "Tirth didn't just build our SEO dashboard; he built a system that thinks for us. 
-                His ability to blend AI intelligence with premium UX is unmatched."
-              </p>
-              <div>
-                <p style={{ fontWeight: 800, fontSize: '1.2rem' }}>Alex Rivera</p>
-                <p style={{ color: '#71717a' }}>Product Director @ Hermes Tech</p>
-              </div>
-           </motion.div>
-        </div>
-      </section>
-
-      {/* Final Conversion CTA */}
-      <section id="contact" className="section" style={{ paddingBottom: '150px' }}>
-        <div className="container">
-          <motion.div 
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="glass-card contact-card" 
-            style={{ padding: '5rem', textAlign: 'center', position: 'relative', overflow: 'hidden' }}
-          >
-            <h2 style={{ fontSize: '4rem', fontWeight: 900, marginBottom: '1.5rem', letterSpacing: '-2px' }}>
-              Ready to Build <span className="text-gradient">Something Iconic?</span>
+          <div className="flex" style={{ flexDirection: 'column', alignItems: 'center', marginBottom: '5rem', textAlign: 'center' }}>
+            <h2 style={{ fontSize: '3rem', fontWeight: 800, marginBottom: '1rem' }}>
+              Professional <span className="text-gradient">Timeline</span>
             </h2>
-            <p style={{ color: '#a1a1aa', fontSize: '1.3rem', maxWidth: '650px', margin: '0 auto 4rem' }}>
-              Currently accepting new high-impact projects. Let's discuss how we can scale your vision.
+            <p style={{ color: '#a1a1aa', fontSize: '1.1rem', maxWidth: '600px' }}>
+              My training internships, academic benchmarks, and education history.
             </p>
-            <div className="flex-center" style={{ gap: '1.5rem', flexWrap: 'wrap', marginBottom: '4rem' }}>
-              <motion.a 
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                href="mailto:hello@tirthpatel.dev" 
-                className="btn btn-primary" 
-                style={{ fontSize: '1.2rem', padding: '1rem 3rem' }}
-              >
-                Start a Conversation
-              </motion.a>
-              <a href="#" className="btn btn-outline" style={{ fontSize: '1.2rem', padding: '1rem 3rem' }}>
-                Download CV
-              </a>
-            </div>
-            <div className="flex-center" style={{ gap: '3rem' }}>
-              <a href="#" className="flex" style={{ gap: '0.5rem', color: '#a1a1aa' }}><Code2 size={20} /> GitHub</a>
-              <a href="#" className="flex" style={{ gap: '0.5rem', color: '#a1a1aa' }}><Briefcase size={20} /> LinkedIn</a>
-              <a href="#" className="flex" style={{ gap: '0.5rem', color: '#a1a1aa' }}><Mail size={20} /> Email</a>
-            </div>
-          </motion.div>
+          </div>
+
+          <div className="timeline-container">
+            <div className="timeline-line"></div>
+
+            {timelineData.map((item, idx) => (
+              <div key={idx} className="timeline-item">
+                <div className="timeline-dot-wrapper">
+                  <div className="timeline-pulse-dot"></div>
+                </div>
+
+                {/* Alternating layouts */}
+                {idx % 2 === 0 ? (
+                  <>
+                    <div className="timeline-content-left">
+                      <span className="tag" style={{ background: 'rgba(0, 240, 255, 0.05)', color: 'var(--primary)', fontWeight: 600, fontSize: '0.8rem' }}>
+                        {item.date}
+                      </span>
+                    </div>
+                    <div className="timeline-content-right">
+                      <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5 }}
+                        className="glass-card"
+                        style={{ padding: '2rem' }}
+                      >
+                        <div className="flex" style={{ justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                          <h3 style={{ fontSize: '1.3rem', fontWeight: 800 }}>{item.title}</h3>
+                          <span style={{ color: '#71717a', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                            <MapPin size={12} /> {item.location}
+                          </span>
+                        </div>
+                        <h4 style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '1rem', marginBottom: '1rem' }}>
+                          {item.organization}
+                        </h4>
+                        <p style={{ color: '#a1a1aa', fontSize: '0.95rem', lineHeight: 1.6 }}>
+                          {item.description}
+                        </p>
+                      </motion.div>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="timeline-content-left" style={{ marginLeft: 0 }}>
+                      <motion.div
+                        initial={{ opacity: 0, x: -20 }}
+                        whileInView={{ opacity: 1, x: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.5 }}
+                        className="glass-card"
+                        style={{ padding: '2rem' }}
+                      >
+                        <div className="flex" style={{ justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                          <h3 style={{ fontSize: '1.3rem', fontWeight: 800 }}>{item.title}</h3>
+                          <span style={{ color: '#71717a', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                            <MapPin size={12} /> {item.location}
+                          </span>
+                        </div>
+                        <h4 style={{ color: 'var(--secondary)', fontWeight: 600, fontSize: '1rem', marginBottom: '1rem' }}>
+                          {item.organization}
+                        </h4>
+                        <p style={{ color: '#a1a1aa', fontSize: '0.95rem', lineHeight: 1.6 }}>
+                          {item.description}
+                        </p>
+                      </motion.div>
+                    </div>
+                    <div className="timeline-content-right" style={{ textAlign: 'left' }}>
+                      <span className="tag" style={{ background: 'rgba(168, 85, 247, 0.05)', color: 'var(--secondary)', fontWeight: 600, fontSize: '0.8rem' }}>
+                        {item.date}
+                      </span>
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="footer">
+      {/* Certifications and Achievements Section */}
+      <section className="section" style={{ background: 'rgba(255, 255, 255, 0.01)' }}>
         <div className="container">
-          <p>© 2026. Architected with Passion & AI by Tirth Patel.</p>
+          <div className="flex" style={{ flexDirection: 'column', alignItems: 'center', marginBottom: '4rem', textAlign: 'center' }}>
+            <h2 style={{ fontSize: '3rem', fontWeight: 800, marginBottom: '1rem' }}>
+              Academic & <span className="text-gradient">Achievements</span>
+            </h2>
+            <p style={{ color: '#a1a1aa', fontSize: '1.1rem', maxWidth: '600px' }}>
+              National credentials, corporate job simulation highlights, and certifications.
+            </p>
+          </div>
+
+          <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '2rem' }}>
+            {[
+              {
+                title: "Python for Data Science",
+                issuer: "NPTEL National Certification",
+                desc: "Successfully completed structured academic credentials verifying advanced algorithmic competencies in data structuring, scraping, and mathematical computations with Python."
+              },
+              {
+                title: "Data Analyst Job Simulate",
+                issuer: "Deloitte Finalist",
+                desc: "Finalist in the Deloitte job simulation pathway, optimizing time-series trends and producing actionable analytical reports."
+              },
+              {
+                title: "Cybersecurity Analyst Job Simulate",
+                issuer: "Forage Finalist",
+                desc: "Demonstrated systematic vulnerability auditing, defensive firewall designs, and real-time security threat vectors analysis."
+              }
+            ].map((ach, idx) => (
+              <motion.div
+                key={ach.title}
+                initial={{ opacity: 0, scale: 0.95 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                className="glass-card"
+                style={{ padding: '2.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
+              >
+                <div>
+                  <Award size={36} className="text-gradient" style={{ marginBottom: '1.5rem', animationDuration: '4s' }} />
+                  <h3 style={{ fontSize: '1.4rem', fontWeight: 800, marginBottom: '0.5rem' }}>{ach.title}</h3>
+                  <h4 style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '0.9rem', marginBottom: '1rem' }}>{ach.issuer}</h4>
+                  <p style={{ color: '#a1a1aa', fontSize: '0.95rem', lineHeight: 1.6 }}>{ach.desc}</p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Conversion Contact Form */}
+      <section className="section" id="contact" style={{ paddingBottom: '120px' }}>
+        <div className="container">
+          <div className="glass-card" style={{ padding: '4rem', position: 'relative', overflow: 'hidden' }}>
+            
+            <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '3rem', alignItems: 'center' }}>
+              
+              {/* Form Info */}
+              <div>
+                <h2 style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '1.5rem', letterSpacing: '-2px', lineHeight: 1.1 }}>
+                  Let's Build <span className="text-gradient">Something Iconic.</span>
+                </h2>
+                <p style={{ color: '#a1a1aa', fontSize: '1.15rem', marginBottom: '2.5rem', lineHeight: 1.6 }}>
+                  Currently accepting technical roles, autonomous swarm projects, and advanced integrations. Send me a message directly or connect via my active coordinates below.
+                </p>
+
+                <div className="flex" style={{ flexDirection: 'column', gap: '1.5rem', marginBottom: '2.5rem' }}>
+                  <a href="mailto:tirth.p.patel143@gmail.com" className="flex" style={{ gap: '0.8rem', color: '#a1a1aa', fontSize: '1.05rem', alignItems: 'center', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#00f0ff'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>
+                    <Mail size={20} className="text-gradient" /> tirth.p.patel143@gmail.com
+                  </a>
+                  <a href="tel:6353782035" className="flex" style={{ gap: '0.8rem', color: '#a1a1aa', fontSize: '1.05rem', alignItems: 'center', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#00f0ff'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>
+                    <Phone size={20} className="text-gradient" /> +91 6353782035
+                  </a>
+                  <div className="flex" style={{ gap: '0.8rem', color: '#a1a1aa', fontSize: '1.05rem', alignItems: 'center' }}>
+                    <MapPin size={20} className="text-gradient" /> Gandhinagar, Gujarat, India
+                  </div>
+                </div>
+
+                <div className="flex" style={{ gap: '1.5rem' }}>
+                  <a 
+                    href="https://github.com/tirthpatel143" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="btn btn-outline" 
+                    style={{ padding: '0.6rem 1.2rem', borderRadius: '10px', fontSize: '0.9rem', gap: '0.5rem' }}
+                  >
+                    <GithubIcon size={16} /> GitHub
+                  </a>
+                  <a 
+                    href="https://www.linkedin.com/in/tirthpatel143/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="btn btn-outline" 
+                    style={{ padding: '0.6rem 1.2rem', borderRadius: '10px', fontSize: '0.9rem', gap: '0.5rem' }}
+                  >
+                    <LinkedInIcon size={16} /> LinkedIn
+                  </a>
+                </div>
+              </div>
+
+              {/* Form Input Interface */}
+              <div className="glass-card" style={{ padding: '2.5rem', background: 'rgba(0, 0, 0, 0.4)', border: '1px solid rgba(255,255,255,0.03)' }}>
+                <AnimatePresence mode="wait">
+                  {formStatus === 'success' ? (
+                    <motion.div
+                      key="success"
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0 }}
+                      style={{ textAlign: 'center', padding: '2rem 0' }}
+                    >
+                      <CheckCircle2 size={60} style={{ color: 'var(--primary)', marginBottom: '1.5rem', margin: '0 auto', filter: 'drop-shadow(0 0 10px rgba(0, 240, 255, 0.4))' }} />
+                      <h3 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '0.8rem' }}>Transmission Received!</h3>
+                      <p style={{ color: '#a1a1aa', lineHeight: 1.6 }}>
+                        Thank you for getting in touch. I will read your message and respond via email within 24 hours. Let's make something amazing.
+                      </p>
+                    </motion.div>
+                  ) : (
+                    <motion.form 
+                      key="form"
+                      onSubmit={handleContactSubmit}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      <div className="contact-input-group">
+                        <input 
+                          type="text" 
+                          placeholder=" "
+                          className="contact-input" 
+                          id="form-name"
+                          required
+                          value={formData.name}
+                          onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                        />
+                        <label htmlFor="form-name" className="contact-label">Full Name</label>
+                      </div>
+
+                      <div className="contact-input-group">
+                        <input 
+                          type="email" 
+                          placeholder=" "
+                          className="contact-input" 
+                          id="form-email"
+                          required
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                        />
+                        <label htmlFor="form-email" className="contact-label">Email Address</label>
+                      </div>
+
+                      <div className="contact-input-group" style={{ marginBottom: '2.5rem' }}>
+                        <textarea 
+                          placeholder=" "
+                          className="contact-input contact-textarea" 
+                          id="form-message"
+                          required
+                          value={formData.message}
+                          onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                        ></textarea>
+                        <label htmlFor="form-message" className="contact-label">Your Message</label>
+                      </div>
+
+                      <button 
+                        type="submit" 
+                        className="btn btn-primary" 
+                        disabled={formStatus === 'sending'}
+                        style={{ width: '100%', justifyContent: 'center' }}
+                      >
+                        {formStatus === 'sending' ? 'Sending Data...' : 'Dispatch Message'} <Send size={16} />
+                      </button>
+                    </motion.form>
+                  )}
+                </AnimatePresence>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Cyberpunk Footer */}
+      <footer className="footer" style={{ background: '#020204', borderTop: '1px solid rgba(255,255,255,0.03)', padding: '3.5rem 0' }}>
+        <div className="container flex" style={{ flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
+          <div className="flex" style={{ alignItems: 'center', gap: '0.5rem' }}>
+            <Terminal size={18} className="text-gradient" />
+            <span style={{ fontWeight: 800, fontSize: '1.1rem', letterSpacing: '-0.5px', fontFamily: 'var(--font-display)' }}>
+              TIRTH<span className="text-gradient">.DEV</span>
+            </span>
+          </div>
+          <p style={{ fontSize: '0.9rem', color: '#71717a' }}>
+            © {new Date().getFullYear()} Tirth Patel. Designed & Architected with pure Next.js & Framer Motion.
+          </p>
         </div>
       </footer>
     </main>
