@@ -336,6 +336,17 @@ export default function Home() {
   ]);
   const [terminalInput, setTerminalInput] = useState('');
   
+  // Project View States
+  const [projectViewMode, setProjectViewMode] = useState<'deck' | 'grid'>('deck');
+  const [selectedDeckIndex, setSelectedDeckIndex] = useState(0);
+  const [hoveredDeckIndex, setHoveredDeckIndex] = useState<number | null>(null);
+  const [isDeckHovered, setIsDeckHovered] = useState(false);
+
+  const activeDeckIndex = hoveredDeckIndex !== null ? hoveredDeckIndex : selectedDeckIndex;
+  const projectColors = useMemo(() => ["#6366f1", "#06b6d4", "#ec4899", "#a855f7", "#10b981"], []);
+  const selectedDeckProject = useMemo(() => projectsData[activeDeckIndex] || projectsData[0], [activeDeckIndex]);
+  const selectedDeckProjectColor = useMemo(() => projectColors[activeDeckIndex % projectColors.length], [activeDeckIndex, projectColors]);
+  
   // Contact Form State
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [formStatus, setFormStatus] = useState<'idle' | 'sending' | 'success'>('idle');
@@ -370,11 +381,13 @@ export default function Home() {
 
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      const interactive = target.closest('a, button, .glass-card, .swarm-node, .skills-tab-btn, .project-card, .btn');
+      const interactive = target.closest('a, button, .glass-card, .swarm-node, .skills-tab-btn, .project-card, .btn, .deck-card');
       if (interactive) {
         setIsHovered(true);
         if (interactive.classList.contains('glass-card') && interactive.id === "contact-form-container") {
           setHoverText("");
+        } else if (interactive.classList.contains('deck-card')) {
+          setHoverText("SELECT");
         } else if (interactive.classList.contains('glass-card') || interactive.classList.contains('project-card')) {
           setHoverText("VIEW");
         } else if (interactive.classList.contains('swarm-node')) {
@@ -945,85 +958,369 @@ export default function Home() {
               A curated look into my production chatbots, automated search engine optimization crawlers, and data systems.
             </p>
 
-            {/* Filter Matrix Pills */}
-            <div className="flex" style={{ gap: '0.8rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-              {["All", "AI & Agents", "Data Science", "Voice & Utility"].map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setActiveCategory(cat)}
-                  className={`skills-tab-btn ${activeCategory === cat ? 'active' : ''}`}
-                >
-                  {cat}
-                </button>
-              ))}
+            {/* View Mode Switcher */}
+            <div className="flex" style={{ gap: '0.5rem', background: 'rgba(255,255,255,0.02)', padding: '0.3rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.05)', marginBottom: '2.5rem' }}>
+              <button 
+                onClick={() => setProjectViewMode('deck')} 
+                className={`terminal-tab-btn ${projectViewMode === 'deck' ? 'active' : ''}`}
+                style={{ fontSize: '0.85rem' }}
+              >
+                Interactive Fan Deck
+              </button>
+              <button 
+                onClick={() => setProjectViewMode('grid')} 
+                className={`terminal-tab-btn ${projectViewMode === 'grid' ? 'active' : ''}`}
+                style={{ fontSize: '0.85rem' }}
+              >
+                Matrix Grid
+              </button>
             </div>
+
+            {projectViewMode === 'grid' ? (
+              /* Filter Matrix Pills */
+              <div className="flex" style={{ gap: '0.8rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                {["All", "AI & Agents", "Data Science", "Voice & Utility"].map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setActiveCategory(cat)}
+                    className={`skills-tab-btn ${activeCategory === cat ? 'active' : ''}`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <p style={{ color: '#64748b', fontSize: '0.85rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                <Sparkles size={12} className="text-gradient" /> Hover card deck to fan out // Click cards to inspect details
+              </p>
+            )}
           </div>
 
-          {/* Projects Fluid Grid */}
-          <motion.div 
-            layout 
-            className="grid" 
-            style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '2.5rem' }}
-          >
-            <AnimatePresence mode="popLayout">
-              {filteredProjects.map((proj: Project, idx: number) => (
-                <SpotlightCard
-                  layout
-                  initial={{ opacity: 0, y: 35, scale: 0.95 }}
-                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 0.6, type: "spring", stiffness: 100, damping: 15 }}
-                  key={proj.title}
-                  className="glass-card"
-                  style={{ padding: '2rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}
-                >
-                  <div>
-                    <div className="flex" style={{ justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
-                      <div style={{ padding: '0.8rem', background: 'rgba(255, 255, 255, 0.03)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
-                        {proj.category.includes("AI") ? (
-                          <Sparkles size={24} className="text-gradient" />
-                        ) : proj.category.includes("Data") ? (
-                          <Database size={24} style={{ color: 'var(--secondary)' }} />
-                        ) : (
-                          <Cpu size={24} style={{ color: 'var(--accent)' }} />
-                        )}
-                      </div>
-                      <span className="tag" style={{ fontSize: '0.7rem', background: 'rgba(16, 185, 129, 0.08)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.25)' }}>
-                        {proj.impact}
+          {projectViewMode === 'deck' ? (
+            <div className="project-deck-grid">
+              
+              {/* Left Column: Project Info Panel */}
+              <div style={{ minHeight: '380px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={selectedDeckProject.title}
+                    initial={{ opacity: 0, x: -30 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 30 }}
+                    transition={{ duration: 0.4, type: "spring", stiffness: 120 }}
+                    style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}
+                  >
+                    <div className="flex" style={{ gap: '0.8rem', alignItems: 'center' }}>
+                      <span className="tag" style={{ background: `${selectedDeckProjectColor}15`, color: selectedDeckProjectColor, borderColor: `${selectedDeckProjectColor}30`, fontWeight: 600 }}>
+                        {selectedDeckProject.category}
+                      </span>
+                      <span className="tag" style={{ background: 'rgba(16, 185, 129, 0.08)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.2)' }}>
+                        {selectedDeckProject.impact}
                       </span>
                     </div>
 
-                    <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '1rem', color: '#ffffff' }}>
-                      {proj.title}
+                    <h3 style={{ fontSize: '2.5rem', fontWeight: 900, fontFamily: 'var(--font-display)', letterSpacing: '-1px', color: '#ffffff' }}>
+                      {selectedDeckProject.title}
                     </h3>
-                    <p style={{ color: '#a1a1aa', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '1.5rem' }}>
-                      {proj.description}
-                    </p>
-                  </div>
 
-                  <div>
-                    <div className="flex" style={{ gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
-                      {proj.tech.map((t: string) => (
-                        <span key={t} className="tag" style={{ fontSize: '0.75rem', padding: '0.2rem 0.8rem' }}>
+                    <p style={{ color: '#a1a1aa', fontSize: '1.1rem', lineHeight: 1.7 }}>
+                      {selectedDeckProject.description}
+                    </p>
+
+                    <div className="flex" style={{ gap: '0.6rem', flexWrap: 'wrap', margin: '0.5rem 0' }}>
+                      {selectedDeckProject.tech.map((t: string) => (
+                        <span key={t} className="tag" style={{ fontSize: '0.75rem', padding: '0.3rem 0.8rem', borderColor: 'rgba(255,255,255,0.06)', background: 'rgba(255,255,255,0.02)' }}>
                           {t}
                         </span>
                       ))}
                     </div>
 
-                    <a 
-                      href={proj.link} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="btn btn-outline" 
-                      style={{ width: '100%', justifyContent: 'center', padding: '0.7rem 1rem', fontSize: '0.9rem' }}
-                    >
-                      View Source Code <ExternalLink size={14} />
-                    </a>
-                  </div>
-                </SpotlightCard>
-              ))}
-            </AnimatePresence>
-          </motion.div>
+                    <div>
+                      <a 
+                        href={selectedDeckProject.link} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="btn btn-primary"
+                        style={{ alignSelf: 'flex-start', background: `linear-gradient(135deg, ${selectedDeckProjectColor}, rgba(0,0,0,0.8))` }}
+                      >
+                        Inspect Source Code <ExternalLink size={16} />
+                      </a>
+                    </div>
+                  </motion.div>
+                </AnimatePresence>
+              </div>
+
+              {/* Right Column: Stacking Interactive Card Deck */}
+              <div className="deck-wrapper">
+                <div 
+                  className="deck-container"
+                  style={{ 
+                    position: 'relative', 
+                    width: '290px', 
+                    height: '380px', 
+                    cursor: 'pointer',
+                  }}
+                  onMouseEnter={() => setIsDeckHovered(true)}
+                  onMouseLeave={() => {
+                    setIsDeckHovered(false);
+                    setHoveredDeckIndex(null);
+                  }}
+                >
+                  {projectsData.map((proj, idx) => {
+                    const isSelected = selectedDeckIndex === idx;
+                    const isHoveredCard = hoveredDeckIndex === idx;
+                    const cardColor = projectColors[idx % projectColors.length];
+                    
+                    // Fan geometry offsets
+                    const total = projectsData.length;
+                    const mid = (total - 1) / 2;
+                    const offset = idx - mid; // -2, -1, 0, 1, 2
+                    
+                    const fanRotate = isDeckHovered ? offset * 12 : offset * 3;
+                    const fanX = isDeckHovered ? offset * 42 : offset * 6;
+                    const fanY = isDeckHovered ? Math.abs(offset) * 12 : 0;
+                    
+                    // Scale active or hovered cards larger
+                    const scale = isHoveredCard ? 1.06 : isSelected ? 1.03 : 1 - Math.abs(offset) * 0.03;
+                    
+                    // Z-index sorting: hovered card on absolute top, then selected card
+                    let zIndex = 10 - Math.abs(offset);
+                    if (isSelected) zIndex = 50;
+                    if (isHoveredCard) zIndex = 100;
+                    
+                    return (
+                      <motion.div
+                        key={proj.title}
+                        className="deck-card"
+                        onClick={() => setSelectedDeckIndex(idx)}
+                        onMouseEnter={() => setHoveredDeckIndex(idx)}
+                        onMouseLeave={() => setHoveredDeckIndex(null)}
+                        style={{
+                          position: 'absolute',
+                          width: '100%',
+                          height: '100%',
+                          borderRadius: '24px',
+                          background: 'rgba(10, 10, 16, 0.95)',
+                          border: `1.5px solid ${isSelected ? cardColor : 'rgba(255, 255, 255, 0.05)'}`,
+                          padding: '2.5rem',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between',
+                          boxShadow: isSelected 
+                            ? `0 15px 40px ${cardColor}15, 0 0 25px rgba(0,0,0,0.8)` 
+                            : `0 8px 30px rgba(0,0,0,0.5)`,
+                          zIndex: zIndex,
+                          transformOrigin: 'bottom center',
+                          overflow: 'hidden'
+                        }}
+                        animate={{
+                          x: fanX,
+                          y: fanY,
+                          rotate: fanRotate,
+                          scale: scale,
+                        }}
+                        transition={{
+                          type: "spring",
+                          stiffness: 150,
+                          damping: 18,
+                          mass: 0.8
+                        }}
+                        whileHover={{
+                          y: fanY - 20,
+                          scale: scale + 0.02,
+                          borderColor: cardColor,
+                          boxShadow: `0 20px 40px ${cardColor}25`,
+                        }}
+                      >
+                        {/* Card Background Auroras */}
+                        <div 
+                          style={{ 
+                            position: 'absolute', 
+                            top: '-50%', 
+                            left: '-50%', 
+                            width: '200%', 
+                            height: '200%', 
+                            background: `radial-gradient(circle, ${cardColor}08 0%, transparent 60%)`, 
+                            pointerEvents: 'none',
+                            borderRadius: 'inherit'
+                          }} 
+                        />
+
+                        {/* Top Label */}
+                        <div className="flex" style={{ justifyContent: 'space-between', alignItems: 'center', width: '100%', position: 'relative', zIndex: 2 }}>
+                          <div style={{ width: '40px', height: '40px', background: `${cardColor}15`, borderRadius: '12px', border: `1px solid ${cardColor}30`, display: 'flex', alignItems: 'center', justifyContent: 'center', color: cardColor }}>
+                            {proj.category.includes("AI") ? (
+                              <Sparkles size={20} />
+                            ) : proj.category.includes("Data") ? (
+                              <Database size={20} />
+                            ) : (
+                              <Cpu size={20} />
+                            )}
+                          </div>
+                          <span className="tag" style={{ fontSize: '0.65rem', background: 'rgba(255,255,255,0.03)', color: '#94a3b8', border: '1px solid rgba(255,255,255,0.05)' }}>
+                            {proj.category}
+                          </span>
+                        </div>
+
+                        {/* Simulated Graphic Visualizer Mockup */}
+                        <div style={{ height: '140px', width: '100%', position: 'relative', overflow: 'hidden', margin: '2rem 0', borderRadius: '16px', background: 'rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.02)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          {idx === 0 && (
+                            /* RAG ChatBot Node Diagram */
+                            <div className="flex" style={{ gap: '1.2rem', alignItems: 'center' }}>
+                              <div className="swarm-node-pulse" style={{ background: cardColor, width: '12px', height: '12px', borderRadius: '50%' }} />
+                              <div style={{ height: '2px', width: '40px', background: `linear-gradient(90deg, ${cardColor}, rgba(255,255,255,0.05))` }} />
+                              <div className="swarm-node-pulse" style={{ background: '#ec4899', width: '8px', height: '8px', borderRadius: '50%' }} />
+                            </div>
+                          )}
+                          {idx === 1 && (
+                            /* SEO audit crawl lines */
+                            <div className="flex" style={{ flexDirection: 'column', gap: '0.5rem', width: '80%' }}>
+                              <div style={{ height: '6px', width: '100%', background: `linear-gradient(90deg, ${cardColor}, transparent)`, borderRadius: '3px' }} />
+                              <div style={{ height: '6px', width: '70%', background: `linear-gradient(90deg, ${cardColor}, transparent)`, borderRadius: '3px' }} />
+                              <div style={{ height: '6px', width: '85%', background: `linear-gradient(90deg, ${cardColor}, transparent)`, borderRadius: '3px' }} />
+                            </div>
+                          )}
+                          {idx === 2 && (
+                            /* Stock forecast chart wave lines */
+                            <svg width="80%" height="60" viewBox="0 0 100 30" fill="none" style={{ overflow: 'visible' }}>
+                              <path d="M0,20 Q15,5 30,15 T60,5 T90,25 T100,10" stroke={cardColor} strokeWidth="2.5" strokeLinecap="round" />
+                              <path d="M0,20 Q15,5 30,15 T60,5 T90,25 T100,10 L100,30 L0,30 Z" fill={`url(#grad-${idx})`} opacity="0.08" />
+                              <defs>
+                                <linearGradient id={`grad-${idx}`} x1="0" y1="0" x2="0" y2="1">
+                                  <stop offset="0%" stopColor={cardColor} stopOpacity={0.8} />
+                                  <stop offset="100%" stopColor={cardColor} stopOpacity={0} />
+                                </linearGradient>
+                              </defs>
+                            </svg>
+                          )}
+                          {idx === 3 && (
+                            /* Social media bar chart matrix */
+                            <div className="flex" style={{ alignItems: 'flex-end', gap: '0.6rem', height: '60px' }}>
+                              {[25, 45, 75, 35, 60].map((h, bIdx) => (
+                                <div key={bIdx} style={{ width: '12px', height: `${h}%`, background: `linear-gradient(180deg, ${cardColor}, rgba(0,0,0,0.8))`, borderRadius: '3px' }} />
+                              ))}
+                            </div>
+                          )}
+                          {idx === 4 && (
+                            /* Voice pyAudio waves */
+                            <div className="flex" style={{ gap: '0.3rem', alignItems: 'center', height: '40px' }}>
+                              {[8, 22, 12, 38, 26, 45, 18, 30, 10].map((h, wIdx) => (
+                                <motion.div 
+                                  key={wIdx} 
+                                  style={{ width: '4px', height: `${h}px`, background: cardColor, borderRadius: '2px' }} 
+                                  animate={{ height: [h, h * 0.4, h] }}
+                                  transition={{ duration: 1.5, repeat: Infinity, delay: wIdx * 0.15 }}
+                                />
+                              ))}
+                            </div>
+                          )}
+                        </div>
+
+                        {/* Bottom title & index marker */}
+                        <div style={{ position: 'relative', zIndex: 2 }}>
+                          <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: '#64748b', display: 'block', marginBottom: '0.2rem' }}>
+                            DIRECTIVE // 0{idx + 1}
+                          </span>
+                          <h4 style={{ fontSize: '1.2rem', fontWeight: 800, color: '#ffffff' }}>
+                            {proj.title}
+                          </h4>
+                        </div>
+
+                        {/* Frosted Badge Overlay (Click to view) */}
+                        {isSelected && (
+                          <div style={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            background: 'rgba(255, 255, 255, 0.08)',
+                            backdropFilter: 'blur(10px)',
+                            border: '1px solid rgba(255, 255, 255, 0.1)',
+                            padding: '0.6rem 1.2rem',
+                            borderRadius: '50px',
+                            color: '#ffffff',
+                            fontSize: '0.8rem',
+                            fontWeight: 700,
+                            boxShadow: '0 8px 32px rgba(0,0,0,0.4)',
+                            pointerEvents: 'none',
+                            letterSpacing: '0.05em',
+                          }}>
+                            VIEW ACTIVE
+                          </div>
+                        )}
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          ) : (
+            /* Projects Fluid Grid */
+            <motion.div 
+              layout 
+              className="grid" 
+              style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))', gap: '2.5rem' }}
+            >
+              <AnimatePresence mode="popLayout">
+                {filteredProjects.map((proj: Project, idx: number) => (
+                  <SpotlightCard
+                    layout
+                    initial={{ opacity: 0, y: 35, scale: 0.95 }}
+                    whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                    viewport={{ once: true, margin: "-50px" }}
+                    transition={{ duration: 0.6, type: "spring", stiffness: 100, damping: 15 }}
+                    key={proj.title}
+                    className="glass-card"
+                    style={{ padding: '2rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}
+                  >
+                    <div>
+                      <div className="flex" style={{ justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
+                        <div style={{ padding: '0.8rem', background: 'rgba(255, 255, 255, 0.03)', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                          {proj.category.includes("AI") ? (
+                            <Sparkles size={24} className="text-gradient" />
+                          ) : proj.category.includes("Data") ? (
+                            <Database size={24} style={{ color: 'var(--secondary)' }} />
+                          ) : (
+                            <Cpu size={24} style={{ color: 'var(--accent)' }} />
+                          )}
+                        </div>
+                        <span className="tag" style={{ fontSize: '0.7rem', background: 'rgba(16, 185, 129, 0.08)', color: '#10b981', borderColor: 'rgba(16, 185, 129, 0.25)' }}>
+                          {proj.impact}
+                        </span>
+                      </div>
+
+                      <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '1rem', color: '#ffffff' }}>
+                        {proj.title}
+                      </h3>
+                      <p style={{ color: '#a1a1aa', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '1.5rem' }}>
+                        {proj.description}
+                      </p>
+                    </div>
+
+                    <div>
+                      <div className="flex" style={{ gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
+                        {proj.tech.map((t: string) => (
+                          <span key={t} className="tag" style={{ fontSize: '0.75rem', padding: '0.2rem 0.8rem' }}>
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+
+                      <a 
+                        href={proj.link} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="btn btn-outline" 
+                        style={{ width: '100%', justifyContent: 'center', padding: '0.7rem 1rem', fontSize: '0.9rem' }}
+                      >
+                        View Source Code <ExternalLink size={14} />
+                      </a>
+                    </div>
+                  </SpotlightCard>
+                ))}
+              </AnimatePresence>
+            </motion.div>
+          )}
         </div>
       </section>
 
