@@ -3,7 +3,7 @@
 import { 
   ArrowRight, Code2, Briefcase, Mail, ExternalLink, 
   Terminal, Cpu, Globe, Rocket, MessageSquare, 
-  Layers, Database, Sparkles, Star, ChevronRight,
+  Layers, Database, Sparkles, Star, ChevronLeft, ChevronRight,
   CheckCircle2, MapPin, Award, Send, Phone
 } from "lucide-react";
 import Image from "next/image";
@@ -105,22 +105,26 @@ const projectsData: Project[] = [
 const skillCategories = [
   {
     title: "AI & Machine Learning",
-    icon: <Sparkles size={20} className="text-gradient" />,
+    icon: <Sparkles size={20} />,
+    color: "#6366f1",
     skills: ["LangChain", "LlamaIndex", "RAG Systems", "Hermes Agent Framework", "Prompt Engineering", "OpenAI & OpenRouter APIs", "OpenCV", "Scikit-Learn"]
   },
   {
     title: "Backend & Databases",
-    icon: <Database size={20} className="text-gradient" />,
+    icon: <Database size={20} />,
+    color: "#ec4899",
     skills: ["Python", "SQL", "FastAPI", "Flask", "PostgreSQL (pgvector)", "MySQL", "Qdrant Vector DB", "Faiss Indexing"]
   },
   {
     title: "Tools & Libraries",
-    icon: <Cpu size={20} className="text-gradient" />,
+    icon: <Cpu size={20} />,
+    color: "#06b6d4",
     skills: ["N8N", "MeiliSearch", "Docker", "Git / GitHub", "Power BI", "Google Analytics 4", "Pandas", "NumPy", "Seaborn", "Matplotlib"]
   },
   {
     title: "Web Technologies",
-    icon: <Globe size={20} className="text-gradient" />,
+    icon: <Globe size={20} />,
+    color: "#a855f7",
     skills: ["HTML5", "CSS3", "JavaScript", "TypeScript", "Next.js", "React", "Vanilla CSS", "Tailwind CSS"]
   }
 ];
@@ -321,6 +325,261 @@ const SpotlightCard = ({ children, className = "", style = {}, whileHover = {}, 
         {children}
       </div>
     </motion.div>
+  );
+};
+
+// -------------------------------------------------------------
+// Interactive Overlapping Tech Stack Dock (Figma-Blender Style)
+// -------------------------------------------------------------
+interface TechDockItem {
+  name: string;
+  color: string;
+  bgColor: string;
+  icon: React.ReactNode;
+}
+
+const techDockItems: TechDockItem[] = [
+  {
+    name: "Python",
+    color: "#38bdf8",
+    bgColor: "rgba(56, 189, 248, 0.1)",
+    icon: (
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12.12 2c-3.13 0-2.93 1.35-2.93 1.35h1.58c1.64 0 2.21.9 2.21 2.22V7.1h3.18c1.67 0 3.03 1.25 3.03 2.92v2.8s.07 3.32-2.9 3.32h-.87V14.5c0-1.85-1.52-3.43-3.37-3.43H8.84v-2.8c0-1.63 1.29-3.03 2.91-3.03h2.82V3.35S14.86 2 12.12 2zm-.24 20c3.13 0 2.93-1.35 2.93-1.35h-1.58c-1.64 0-2.21-.9-2.21-2.22v-1.53H7.84c-1.67 0-3.03-1.25-3.03-2.92v-2.8s-.07-3.32 2.9-3.32h.87v1.62c0 1.85 1.52 3.43 3.37 3.43h3.2v2.8c0 1.63-1.29 3.03-2.91 3.03H8.22v1.89s-.27 1.35 2.46 1.35zM9.42 5.37c-.38 0-.7.31-.7.7 0 .38.32.7.7.7a.7.7 0 0 0 0-1.4zm5.16 13.26c-.38 0-.7.31-.7.7 0 .38.32.7.7.7a.7.7 0 0 0 0-1.4z"/>
+      </svg>
+    )
+  },
+  {
+    name: "FastAPI",
+    color: "#059669",
+    bgColor: "rgba(5, 150, 105, 0.1)",
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" fill="currentColor"/>
+      </svg>
+    )
+  },
+  {
+    name: "React",
+    color: "#00f0ff",
+    bgColor: "rgba(0, 240, 255, 0.1)",
+    icon: (
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="2" fill="currentColor"/>
+        <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2z" opacity="0.1"/>
+        <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(30 12 12)"/>
+        <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(90 12 12)"/>
+        <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(150 12 12)"/>
+      </svg>
+    )
+  },
+  {
+    name: "Next.js",
+    color: "#ffffff",
+    bgColor: "rgba(255, 255, 255, 0.1)",
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <circle cx="12" cy="12" r="10" fill="black"/>
+        <path d="M16 8 L8 16 M16 8 L16 16" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+        <path d="M8 8 C 10 10, 11 12, 12 16" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+      </svg>
+    )
+  },
+  {
+    name: "PostgreSQL",
+    color: "#3b82f6",
+    bgColor: "rgba(59, 130, 246, 0.1)",
+    icon: (
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14.5c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5.67-1.5 1.5-1.5 1.5.67 1.5 1.5zm-1.5-3.5c-.55 0-1-.45-1-1V8c0-.55.45-1 1-1s1 .45 1 1v4c0 .55-.45 1-1 1z" opacity="0.1"/>
+        <path d="M18.8 9.5c-.3-1.1-.9-2.1-1.8-2.9-.8-.7-1.8-1.1-2.9-1.2-1.3-.1-2.6.4-3.5 1.3l-.6.6-.6-.6C8.5 5.8 7.2 5.3 5.9 5.4c-1.1.1-2.1.5-2.9 1.2-.9.8-1.5 1.8-1.8 2.9-.3 1.2-.2 2.5.3 3.6.5 1.1 1.4 2 2.5 2.5 1.1.5 2.4.6 3.6.3l.8-.2.8.2c1.2.3 2.5.2 3.6-.3 1.1-.5 2-1.4 2.5-2.5.5-1.1.6-2.4.3-3.6zM12 13c-.6 0-1-.4-1-1V9c0-.6.4-1 1-1s1 .4 1 1v3c0 .6-.4 1-1 1z"/>
+      </svg>
+    )
+  },
+  {
+    name: "Qdrant",
+    color: "#f43f5e",
+    bgColor: "rgba(244, 63, 94, 0.1)",
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="3" y="3" width="7" height="7"/>
+        <rect x="14" y="3" width="7" height="7"/>
+        <rect x="14" y="14" width="7" height="7"/>
+        <rect x="3" y="14" width="7" height="7"/>
+        <line x1="10" y1="6.5" x2="14" y2="6.5"/>
+        <line x1="6.5" y1="10" x2="6.5" y2="14"/>
+      </svg>
+    )
+  },
+  {
+    name: "Docker",
+    color: "#0284c7",
+    bgColor: "rgba(2, 132, 199, 0.1)",
+    icon: (
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M13.983 11.078h2.119v-2.006h-2.119v2.006zm-2.737 0h2.119v-2.006h-2.119v2.006zm-2.737 0h2.12v-2.006h-2.12v2.006zm-2.737 0h2.119v-2.006H5.773v2.006zm-.245-2.28h2.119V6.792h-2.119v2.006zm2.737 0h2.12V6.792h-2.12v2.006zm2.737 0h2.119V6.792h-2.119v2.006zm-5.474-2.28h2.119V4.512h-2.119v2.006zM24 10.627c-.224-.174-.6-.327-1.102-.327-.551 0-.939.224-1.163.53-.265.347-.367.755-.367 1.286 0 .571.184.98.51 1.265.326.285.836.428 1.489.428h.633V10.627zm-1.898 3.51c-.653 0-1.183-.184-1.53-.551-.347-.367-.53-.877-.53-1.51 0-.612.183-1.122.53-1.469.347-.347.877-.53 1.53-.53h1.898V8.586H12.392V14.5c0 .388.163.755.449 1.02.285.265.653.408 1.04.408h7.94c.163 0 .326-.041.469-.122l.53-.306-.718-1.347zm-11.428 1.408c.55 0 1.04-.265 1.347-.714.306-.449.449-.98.449-1.53v-5.469H8.489v5.469c0 .55.143 1.08.449 1.53.306.449.797.714 1.347.714zm0-6.326h2.119V7.218h-2.119v2.006z"/>
+      </svg>
+    )
+  },
+  {
+    name: "Git",
+    color: "#ea580c",
+    bgColor: "rgba(234, 88, 12, 0.1)",
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="18" cy="18" r="3"/>
+        <circle cx="6" cy="6" r="3"/>
+        <circle cx="6" cy="18" r="3"/>
+        <line x1="6" y1="9" x2="6" y2="15"/>
+        <path d="M18 15V9a4 4 0 0 0-4-4h-5"/>
+      </svg>
+    )
+  },
+  {
+    name: "LangChain",
+    color: "#22c55e",
+    bgColor: "rgba(34, 197, 94, 0.1)",
+    icon: (
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+      </svg>
+    )
+  }
+];
+
+const TechStackDock = () => {
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
+
+  return (
+    <div 
+      className="flex flex-center" 
+      style={{ 
+        gap: '0.4rem', 
+        padding: '1.2rem', 
+        background: 'rgba(255, 255, 255, 0.01)', 
+        border: '1px solid rgba(255, 255, 255, 0.03)',
+        borderRadius: '24px',
+        boxShadow: 'inset 0 1px 0 rgba(255, 255, 255, 0.02)',
+        maxWidth: '100%',
+        overflowX: 'visible',
+        position: 'relative'
+      }}
+    >
+      <div 
+        className="flex" 
+        style={{ 
+          alignItems: 'center', 
+          padding: '1.2rem 1.8rem', 
+          position: 'relative',
+          overflow: 'visible'
+        }}
+      >
+        {techDockItems.map((tech, idx) => {
+          const isHovered = hoveredIdx === idx;
+          return (
+            <div
+              key={tech.name}
+              style={{
+                position: 'relative',
+                zIndex: isHovered ? 50 : 10 - idx,
+                marginLeft: idx === 0 ? 0 : '-1.5rem',
+                transition: 'z-index 0.3s'
+              }}
+              onMouseEnter={() => setHoveredIdx(idx)}
+              onMouseLeave={() => setHoveredIdx(null)}
+            >
+              <motion.div
+                style={{
+                  width: '74px',
+                  height: '74px',
+                  borderRadius: '20px',
+                  background: 'rgba(10, 10, 16, 0.95)',
+                  border: '1.5px solid rgba(255, 255, 255, 0.06)',
+                  color: '#ffffff',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  boxShadow: '0 8px 24px rgba(0, 0, 0, 0.6)'
+                }}
+                animate={{
+                  y: isHovered ? -16 : 0,
+                  scale: isHovered ? 1.15 : 1,
+                  borderColor: isHovered ? tech.color : 'rgba(255, 255, 255, 0.06)',
+                  boxShadow: isHovered
+                    ? `0 15px 35px ${tech.color}25, 0 0 15px ${tech.color}15`
+                    : '0 8px 24px rgba(0, 0, 0, 0.6)'
+                }}
+                transition={{
+                  type: 'spring',
+                  stiffness: 400,
+                  damping: 22,
+                  mass: 0.8
+                }}
+              >
+                {/* Dynamically colored icon container */}
+                <div style={{ 
+                  color: isHovered ? tech.color : '#cbd5e1', 
+                  transition: 'color 0.2s',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center'
+                }}>
+                  {tech.icon}
+                </div>
+              </motion.div>
+
+              {/* Speech Bubble Tooltip */}
+              <AnimatePresence>
+                {isHovered && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    transition={{ duration: 0.15, ease: 'easeOut' }}
+                    style={{
+                      position: 'absolute',
+                      bottom: '-55px',
+                      left: '50%',
+                      transform: 'translateX(-50%)',
+                      background: '#000000',
+                      color: '#ffffff',
+                      padding: '0.45rem 1.1rem',
+                      borderRadius: '10px',
+                      fontSize: '0.8rem',
+                      fontWeight: 700,
+                      fontFamily: 'var(--font-sans)',
+                      whiteSpace: 'nowrap',
+                      border: '1.2px solid rgba(255, 255, 255, 0.08)',
+                      boxShadow: '0 8px 30px rgba(0,0,0,0.8)',
+                      zIndex: 100,
+                      pointerEvents: 'none'
+                    }}
+                  >
+                    {/* Small Arrow pointing up */}
+                    <div 
+                      style={{ 
+                        position: 'absolute', 
+                        top: '-5px', 
+                        left: '50%', 
+                        transform: 'translateX(-50%) rotate(45deg)', 
+                        width: '8px', 
+                        height: '8px', 
+                        background: '#000000', 
+                        borderLeft: '1px solid rgba(255, 255, 255, 0.08)',
+                        borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+                      }} 
+                    />
+                    {tech.name}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 };
 
@@ -1035,7 +1294,7 @@ export default function Home() {
                       ))}
                     </div>
 
-                    <div>
+                    <div className="flex" style={{ gap: '1.2rem', alignItems: 'center', marginTop: '1.5rem', flexWrap: 'wrap' }}>
                       <a 
                         href={selectedDeckProject.link} 
                         target="_blank" 
@@ -1045,6 +1304,77 @@ export default function Home() {
                       >
                         Inspect Source Code <ExternalLink size={16} />
                       </a>
+                      
+                      {/* Premium Interactive Swapper Widget */}
+                      <div className="flex" style={{ gap: '0.6rem', alignItems: 'center', background: 'rgba(255,255,255,0.02)', padding: '0.4rem', borderRadius: '14px', border: '1px solid rgba(255,255,255,0.05)', boxShadow: '0 4px 20px rgba(0,0,0,0.3)' }}>
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedDeckIndex((prev) => (prev - 1 + projectsData.length) % projectsData.length);
+                          }}
+                          className="terminal-tab-btn flex-center"
+                          style={{ 
+                            padding: '0.5rem', 
+                            borderRadius: '10px', 
+                            background: 'rgba(255,255,255,0.03)', 
+                            border: '1px solid rgba(255,255,255,0.05)',
+                            color: '#a1a1aa',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.color = '#ffffff';
+                            e.currentTarget.style.borderColor = selectedDeckProjectColor;
+                            e.currentTarget.style.background = `${selectedDeckProjectColor}15`;
+                            e.currentTarget.style.boxShadow = `0 0 15px ${selectedDeckProjectColor}30`;
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.color = '#a1a1aa';
+                            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
+                            e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
+                            e.currentTarget.style.boxShadow = 'none';
+                          }}
+                          title="Previous Project"
+                        >
+                          <ChevronLeft size={16} />
+                        </button>
+                        
+                        <span style={{ fontSize: '0.85rem', fontFamily: 'var(--font-mono)', fontWeight: 600, color: '#f8fafc', padding: '0 0.6rem', minWidth: '55px', textAlign: 'center', userSelect: 'none' }}>
+                          0{activeDeckIndex + 1} / 0{projectsData.length}
+                        </span>
+                        
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedDeckIndex((prev) => (prev + 1) % projectsData.length);
+                          }}
+                          className="terminal-tab-btn flex-center"
+                          style={{ 
+                            padding: '0.5rem', 
+                            borderRadius: '10px', 
+                            background: 'rgba(255,255,255,0.03)', 
+                            border: '1px solid rgba(255,255,255,0.05)',
+                            color: '#a1a1aa',
+                            cursor: 'pointer',
+                            transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.color = '#ffffff';
+                            e.currentTarget.style.borderColor = selectedDeckProjectColor;
+                            e.currentTarget.style.background = `${selectedDeckProjectColor}15`;
+                            e.currentTarget.style.boxShadow = `0 0 15px ${selectedDeckProjectColor}30`;
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.color = '#a1a1aa';
+                            e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
+                            e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
+                            e.currentTarget.style.boxShadow = 'none';
+                          }}
+                          title="Next Project"
+                        >
+                          <ChevronRight size={16} />
+                        </button>
+                      </div>
                     </div>
                   </motion.div>
                 </AnimatePresence>
@@ -1327,45 +1657,88 @@ export default function Home() {
       {/* Skills Matrix Section */}
       <section className="section" id="skills" style={{ background: 'rgba(3, 3, 5, 0.5)' }}>
         <div className="container">
-          <div className="flex" style={{ flexDirection: 'column', alignItems: 'center', marginBottom: '4rem', textAlign: 'center' }}>
+          <div className="flex" style={{ flexDirection: 'column', alignItems: 'center', marginBottom: '4.5rem', textAlign: 'center' }}>
             <h2 style={{ fontSize: '3rem', fontWeight: 800, marginBottom: '1rem' }}>
               Technical <span className="text-gradient">Arsenal</span>
             </h2>
-            <p style={{ color: '#a1a1aa', fontSize: '1.1rem', maxWidth: '600px' }}>
+            <p style={{ color: '#a1a1aa', fontSize: '1.1rem', maxWidth: '600px', marginBottom: '2.5rem' }}>
               My engineering stack spanning Agent frameworks, core mathematical modeling, and enterprise databases.
             </p>
+
+            {/* High-Graphics Overlapping Tech Stack Dock */}
+            <div style={{ width: '100%', display: 'flex', justifyContent: 'center', margin: '1rem 0 2rem 0' }}>
+              <TechStackDock />
+            </div>
           </div>
 
-          <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '2rem' }}>
+          <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '2.5rem' }}>
             {skillCategories.map((cat, i) => (
-              <motion.div
+              <SpotlightCard
                 key={cat.title}
                 initial={{ opacity: 0, y: 30 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.1 }}
                 className="glass-card"
-                style={{ padding: '2rem' }}
+                style={{ padding: '2.5rem', display: 'flex', flexDirection: 'column', height: '100%', position: 'relative', overflow: 'hidden' }}
               >
-                <div className="flex" style={{ alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-                  <div style={{ padding: '0.6rem', background: 'rgba(255, 255, 255, 0.03)', borderRadius: '10px' }}>
+                {/* Dynamic theme glow background element */}
+                <div 
+                  style={{ 
+                    position: 'absolute', 
+                    bottom: '-25%', 
+                    right: '-25%', 
+                    width: '200px', 
+                    height: '200px', 
+                    background: `radial-gradient(circle, ${cat.color}07 0%, transparent 70%)`, 
+                    pointerEvents: 'none',
+                    zIndex: 0
+                  }} 
+                />
+
+                <div className="flex" style={{ alignItems: 'center', gap: '1.2rem', marginBottom: '1.8rem', position: 'relative', zIndex: 2 }}>
+                  <div style={{ 
+                    padding: '0.7rem', 
+                    background: `${cat.color}12`, 
+                    borderRadius: '12px',
+                    border: `1.5px solid ${cat.color}25`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: cat.color,
+                    boxShadow: `0 0 15px ${cat.color}08`
+                  }}>
                     {cat.icon}
                   </div>
-                  <h3 style={{ fontSize: '1.25rem', fontWeight: 700 }}>{cat.title}</h3>
+                  <h3 style={{ fontSize: '1.35rem', fontWeight: 800, fontFamily: 'var(--font-display)', color: '#ffffff' }}>{cat.title}</h3>
                 </div>
-                <div className="flex" style={{ flexWrap: 'wrap', gap: '0.6rem' }}>
+
+                <div className="flex" style={{ flexWrap: 'wrap', gap: '0.6rem', position: 'relative', zIndex: 2 }}>
                   {cat.skills.map((skill) => (
                     <motion.span
-                      whileHover={{ scale: 1.05, borderColor: 'var(--primary)', color: 'var(--primary)' }}
+                      whileHover={{ 
+                        scale: 1.05, 
+                        borderColor: cat.color, 
+                        color: '#ffffff',
+                        background: `${cat.color}15`,
+                        boxShadow: `0 0 12px ${cat.color}25`
+                      }}
                       key={skill}
                       className="tag"
-                      style={{ cursor: 'default', fontWeight: 500, fontSize: '0.8rem' }}
+                      style={{ 
+                        cursor: 'default', 
+                        fontWeight: 600, 
+                        fontSize: '0.8rem',
+                        borderColor: 'rgba(255,255,255,0.04)',
+                        background: 'rgba(255,255,255,0.01)',
+                        transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
+                      }}
                     >
                       {skill}
                     </motion.span>
                   ))}
                 </div>
-              </motion.div>
+              </SpotlightCard>
             ))}
           </div>
         </div>
@@ -1543,7 +1916,7 @@ export default function Home() {
                   </div>
                 </div>
 
-                <div className="flex" style={{ gap: '1.5rem' }}>
+                <div className="flex" style={{ gap: '1.5rem', marginBottom: '2.5rem' }}>
                   <a 
                     href="https://github.com/tirthpatel143" 
                     target="_blank" 
@@ -1563,10 +1936,32 @@ export default function Home() {
                     <LinkedInIcon size={16} /> LinkedIn
                   </a>
                 </div>
+
+                {/* Premium System Operations Panel */}
+                <div style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.03)', padding: '1.8rem', borderRadius: '20px', position: 'relative', overflow: 'hidden', boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.02)' }}>
+                  <div style={{ position: 'absolute', top: 0, left: 0, height: '2px', width: '35%', background: 'linear-gradient(90deg, var(--primary), transparent)' }} />
+                  <div className="flex" style={{ justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem' }}>
+                    <span style={{ fontSize: '0.75rem', fontFamily: 'var(--font-mono)', color: '#94a3b8', display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 600 }}>
+                      <span className="swarm-node-pulse" style={{ width: '8px', height: '8px', background: '#00f0ff', borderRadius: '50%', display: 'inline-block', boxShadow: '0 0 10px #00f0ff' }}></span>
+                      GATEWAY STATUS: ACTIVE
+                    </span>
+                    <span style={{ fontSize: '0.75rem', fontFamily: 'var(--font-mono)', color: 'var(--primary-bright)', fontWeight: 600 }}>ping: 14ms</span>
+                  </div>
+                  <div className="grid" style={{ gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.02)' }}>
+                      <span style={{ fontSize: '0.65rem', color: '#64748b', display: 'block', fontFamily: 'var(--font-mono)', fontWeight: 600, marginBottom: '0.2rem' }}>AGENT SWARMS</span>
+                      <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#f8fafc', fontFamily: 'var(--font-display)' }}>17 Active Workers</span>
+                    </div>
+                    <div style={{ background: 'rgba(0,0,0,0.3)', padding: '1rem', borderRadius: '12px', border: '1px solid rgba(255,255,255,0.02)' }}>
+                      <span style={{ fontSize: '0.65rem', color: '#64748b', display: 'block', fontFamily: 'var(--font-mono)', fontWeight: 600, marginBottom: '0.2rem' }}>DATABASE RESPONSE</span>
+                      <span style={{ fontSize: '1.1rem', fontWeight: 800, color: '#06b6d4', fontFamily: 'var(--font-display)' }}>Qdrant Vector DB</span>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Form Input Interface */}
-              <div className="glass-card" style={{ padding: '2.5rem', background: 'rgba(0, 0, 0, 0.4)', border: '1px solid rgba(255,255,255,0.03)' }}>
+              <SpotlightCard className="glass-card" style={{ padding: '3rem', background: 'rgba(0, 0, 0, 0.4)', border: '1px solid rgba(255,255,255,0.03)' }} whileHover={{ scale: 1.01 }} whileTap={{ scale: 1 }}>
                 <AnimatePresence mode="wait">
                   {formStatus === 'success' ? (
                     <motion.div
@@ -1639,7 +2034,7 @@ export default function Home() {
                     </motion.form>
                   )}
                 </AnimatePresence>
-              </div>
+              </SpotlightCard>
 
             </div>
           </SpotlightCard>
