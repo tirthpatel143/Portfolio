@@ -7,7 +7,7 @@ import {
   CheckCircle2, MapPin, Award, Send, Phone
 } from "lucide-react";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useSpring, useMotionTemplate } from "framer-motion";
 import { useState, useEffect, useRef, useMemo } from "react";
 
 // Inline Custom SVGs for Robust Icons
@@ -161,9 +161,175 @@ const timelineData = [
   }
 ];
 
+interface AgentNode {
+  id: string;
+  label: string;
+  x: number;
+  y: number;
+  size: number;
+  color: string;
+  desc: string;
+  metric: string;
+  logs: string[];
+}
+
+const agentNodes: AgentNode[] = [
+  {
+    id: "orchestrator",
+    label: "Swarm Orchestrator",
+    x: 160,
+    y: 160,
+    size: 24,
+    color: "#6366f1",
+    desc: "Autonomous supervisor routing metrics and dispatching automated fixes via Hermes loops.",
+    metric: "Active: 17 workers connected",
+    logs: [
+      "Orchestrator boot completed.",
+      "Syncing rosters from swarm.yaml...",
+      "Status CHECK: 17/17 workers reporting live.",
+      "Checkpoints active at /api/swarm-checkpoint"
+    ]
+  },
+  {
+    id: "rag",
+    label: "Yogateria RAG Vector",
+    x: 60,
+    y: 60,
+    size: 20,
+    color: "#ec4899",
+    desc: "LlamaIndex pipeline querying Qdrant vector database to serve personalized Medusa storefront queries.",
+    metric: "Latency: 28ms | 0% Hallucinations",
+    logs: [
+      "Connecting to Qdrant Vector store...",
+      "Embedding Medusa catalog via text-embedding-3-small.",
+      "Retrieval match score: 0.942 [RESOLVED]"
+    ]
+  },
+  {
+    id: "seo",
+    label: "Hermes SEO Swarm",
+    x: 260,
+    y: 60,
+    size: 20,
+    color: "#06b6d4",
+    desc: "17 autonomous SEO agents crawling pages, auditing metrics, and pushing structural content updates.",
+    metric: "95% Automation rate",
+    logs: [
+      "Initializing Crawler agent...",
+      "Parsing GSC endpoints to sync metrics...",
+      "Fix dispatched to github_fixer.py!"
+    ]
+  },
+  {
+    id: "forecaster",
+    label: "Nexus Predictive Forecaster",
+    x: 260,
+    y: 260,
+    size: 20,
+    color: "#818cf8",
+    desc: "Full-stack time-series models comparing ARIMA vs LSTM to produce stock visualizer insights.",
+    metric: "Forecasting Accuracy: 98%",
+    logs: [
+      "Fetching ticker datasets...",
+      "Running LSTM epoch training: Validation Loss 0.002",
+      "Model convergence achieved [SUCCESS]"
+    ]
+  },
+  {
+    id: "voice",
+    label: "SmartIn Voice Engine",
+    x: 60,
+    y: 260,
+    size: 20,
+    color: "#fda4af",
+    desc: "Low-latency PyAudio voice capture parsing spoken triggers to drive systems integration.",
+    metric: "Acoustic latency: 12ms",
+    logs: [
+      "Initializing PyAudio mic listeners...",
+      "Ambient noise cancellation calibrated.",
+      "Speech-to-Text conversion: 100% matched"
+    ]
+  }
+];
+
+const SpotlightCard = ({ children, className = "", style = {}, whileHover = {}, whileTap = {}, initial = {}, whileInView = {}, viewport = {}, transition = {} }: any) => {
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  function handleMouseMove({ currentTarget, clientX, clientY }: React.MouseEvent) {
+    const { left, top } = currentTarget.getBoundingClientRect();
+    mouseX.set(clientX - left);
+    mouseY.set(clientY - top);
+  }
+
+  return (
+    <motion.div
+      className={className}
+      onMouseMove={handleMouseMove}
+      initial={initial}
+      whileInView={whileInView}
+      viewport={viewport}
+      style={{
+        ...style,
+        position: "relative",
+      }}
+      whileHover={{ 
+        scale: 1.03, 
+        y: -6,
+        boxShadow: "0 20px 40px rgba(99, 102, 241, 0.15)",
+        borderColor: "rgba(99, 102, 241, 0.25)",
+        ...whileHover
+      }}
+      whileTap={{ scale: 0.98, ...whileTap }}
+      transition={{ type: "spring", stiffness: 350, damping: 20, ...transition }}
+    >
+      {/* Background Hover Light Gradient */}
+      <motion.div
+        style={{
+          position: "absolute",
+          inset: 0,
+          borderRadius: "inherit",
+          background: useMotionTemplate`
+            radial-gradient(
+              300px circle at ${mouseX}px ${mouseY}px,
+              rgba(99, 102, 241, 0.07),
+              transparent 80%
+            )
+          `,
+          pointerEvents: "none",
+          zIndex: 1,
+        }}
+      />
+      {/* Border Hover Border Light */}
+      <motion.div
+        style={{
+          position: "absolute",
+          inset: -1,
+          borderRadius: "inherit",
+          background: useMotionTemplate`
+            radial-gradient(
+              180px circle at ${mouseX}px ${mouseY}px,
+              rgba(99, 102, 241, 0.28),
+              transparent 80%
+            )
+          `,
+          pointerEvents: "none",
+          zIndex: 0,
+        }}
+      />
+      <div style={{ position: "relative", zIndex: 2, height: "100%", display: "flex", flexDirection: "column", justifyContent: "space-between" }}>
+        {children}
+      </div>
+    </motion.div>
+  );
+};
+
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [isScrolled, setIsScrolled] = useState(false);
+  const [terminalTab, setTerminalTab] = useState<'visual' | 'cli'>('visual');
+  const [activeAgentNode, setActiveAgentNode] = useState<string>('orchestrator');
+  
   const [terminalHistory, setTerminalHistory] = useState<Array<{ type: 'input' | 'output' | 'success' | 'error'; text: string }>>([
     { type: 'output', text: 'Welcome to Tirth Patel OS v1.0.0.' },
     { type: 'output', text: 'Type "help" to see all available commands.' }
@@ -175,6 +341,73 @@ export default function Home() {
   const [formStatus, setFormStatus] = useState<'idle' | 'sending' | 'success'>('idle');
 
   const terminalEndRef = useRef<HTMLDivElement>(null);
+
+  // Custom Cursor Spring Tracking
+  const cursorX = useMotionValue(-100);
+  const cursorY = useMotionValue(-100);
+
+  const springConfig = { damping: 30, stiffness: 300, mass: 0.6 };
+  const cursorXSpring = useSpring(cursorX, springConfig);
+  const cursorYSpring = useSpring(cursorY, springConfig);
+
+  const [isHovered, setIsHovered] = useState(false);
+  const [hoverText, setHoverText] = useState("");
+  const [hasPointer, setHasPointer] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      setHasPointer(window.matchMedia("(pointer: fine)").matches);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!hasPointer) return;
+
+    const moveCursor = (e: MouseEvent) => {
+      cursorX.set(e.clientX - 16);
+      cursorY.set(e.clientY - 16);
+    };
+
+    const handleMouseOver = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const interactive = target.closest('a, button, .glass-card, .swarm-node, .skills-tab-btn, .project-card, .btn');
+      if (interactive) {
+        setIsHovered(true);
+        if (interactive.classList.contains('glass-card') && interactive.id === "contact-form-container") {
+          setHoverText("");
+        } else if (interactive.classList.contains('glass-card') || interactive.classList.contains('project-card')) {
+          setHoverText("VIEW");
+        } else if (interactive.classList.contains('swarm-node')) {
+          setHoverText("INSPECT");
+        } else {
+          setHoverText("");
+        }
+      } else {
+        setIsHovered(false);
+        setHoverText("");
+      }
+    };
+
+    window.addEventListener("mousemove", moveCursor);
+    window.addEventListener("mouseover", handleMouseOver);
+    return () => {
+      window.removeEventListener("mousemove", moveCursor);
+      window.removeEventListener("mouseover", handleMouseOver);
+    };
+  }, [hasPointer]);
+
+  // Automatically cycle through agent nodes in the visualizer
+  useEffect(() => {
+    if (terminalTab !== 'visual') return;
+    const interval = setInterval(() => {
+      setActiveAgentNode((prev) => {
+        const ids = agentNodes.map(n => n.id);
+        const idx = ids.indexOf(prev);
+        return ids[(idx + 1) % ids.length];
+      });
+    }, 4500);
+    return () => clearInterval(interval);
+  }, [terminalTab]);
 
   // Monitor scrolling to style navigation bar
   useEffect(() => {
@@ -434,43 +667,234 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.2 }}
             >
               <div className="terminal-window">
-                <div className="terminal-header">
+                <div className="terminal-header" style={{ padding: '0.8rem 1.2rem' }}>
                   <div className="terminal-dots">
                     <span className="terminal-dot dot-red"></span>
                     <span className="terminal-dot dot-yellow"></span>
                     <span className="terminal-dot dot-green"></span>
                   </div>
-                  <span className="terminal-title">tirth@agent-host: ~</span>
-                  <div style={{ width: '38px' }}></div>
-                </div>
-                <div className="terminal-body">
-                  {terminalHistory.map((line, idx) => (
-                    <div 
-                      key={idx} 
-                      className="terminal-output" 
-                      style={{ 
-                        color: line.type === 'error' ? '#f87171' : 
-                               line.type === 'success' ? 'var(--primary)' : 
-                               line.type === 'input' ? '#ffffff' : '#a1a1aa'
-                      }}
+                  
+                  {/* Premium Tabs */}
+                  <div className="flex" style={{ gap: '0.4rem', background: 'rgba(255,255,255,0.02)', padding: '0.2rem', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.03)' }}>
+                    <button 
+                      onClick={() => setTerminalTab('visual')} 
+                      className={`terminal-tab-btn ${terminalTab === 'visual' ? 'active' : ''}`}
                     >
-                      {line.text}
-                    </div>
-                  ))}
-                  <div ref={terminalEndRef}></div>
-                </div>
-                <form onSubmit={handleTerminalSubmit} className="terminal-header" style={{ background: '#0a0a0f', borderTop: '1px solid rgba(255,255,255,0.03)', padding: '0.5rem 1rem' }}>
-                  <div className="terminal-input-line" style={{ width: '100%' }}>
-                    <span className="terminal-prompt">&gt;</span>
-                    <input 
-                      type="text" 
-                      className="terminal-text-input" 
-                      placeholder="Ask a question or type a command (e.g. 'skills', 'hermes')..."
-                      value={terminalInput}
-                      onChange={(e) => setTerminalInput(e.target.value)}
-                    />
+                      Visual Swarm
+                    </button>
+                    <button 
+                      onClick={() => setTerminalTab('cli')} 
+                      className={`terminal-tab-btn ${terminalTab === 'cli' ? 'active' : ''}`}
+                    >
+                      Interactive CLI
+                    </button>
                   </div>
-                </form>
+
+                  <span className="terminal-title" style={{ display: 'none' }}>tirth@agent-host</span>
+                  <div style={{ width: '40px' }} className="nav-links"></div>
+                </div>
+
+                <AnimatePresence mode="wait">
+                  {terminalTab === 'visual' ? (
+                    <motion.div 
+                      key="visual-swarm"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="flex" 
+                      style={{ flexDirection: 'column', minHeight: '320px', background: 'rgba(4, 4, 8, 0.4)' }}
+                    >
+                      {/* Dynamic SVG Nodes Swarm Graph */}
+                      <div className="visualizer-container" style={{ position: 'relative', height: '240px' }}>
+                        <svg className="absolute inset-0 w-full h-full" style={{ pointerEvents: 'none' }}>
+                          {/* Connections */}
+                          {[
+                            { from: { x: 160, y: 120 }, to: { x: 60, y: 50 }, color: '#ec4899' },
+                            { from: { x: 160, y: 120 }, to: { x: 260, y: 50 }, color: '#06b6d4' },
+                            { from: { x: 160, y: 120 }, to: { x: 260, y: 190 }, color: '#818cf8' },
+                            { from: { x: 160, y: 120 }, to: { x: 60, y: 190 }, color: '#fda4af' }
+                          ].map((line, idx) => {
+                            const isSourceSelected = activeAgentNode === 'orchestrator';
+                            const isDestSelected = activeAgentNode === (idx === 0 ? 'rag' : idx === 1 ? 'seo' : idx === 2 ? 'forecaster' : 'voice');
+                            const isHighlight = isSourceSelected || isDestSelected;
+
+                            return (
+                              <g key={idx}>
+                                <line 
+                                  x1={`${line.from.x / 320 * 100}%`} 
+                                  y1={`${line.from.y / 240 * 100}%`} 
+                                  x2={`${line.to.x / 320 * 100}%`} 
+                                  y2={`${line.to.y / 240 * 100}%`} 
+                                  stroke={isHighlight ? line.color : "rgba(255, 255, 255, 0.04)"} 
+                                  strokeWidth={isHighlight ? "2.5" : "1.5"} 
+                                  style={{ transition: 'all 0.5s ease' }}
+                                />
+                                <motion.circle
+                                  r="3"
+                                  fill={line.color}
+                                  initial={{ cx: `${line.from.x / 320 * 100}%`, cy: `${line.from.y / 240 * 100}%` }}
+                                  animate={{
+                                    cx: [`${line.from.x / 320 * 100}%`, `${line.to.x / 320 * 100}%`],
+                                    cy: [`${line.from.y / 240 * 100}%`, `${line.to.y / 240 * 100}%`]
+                                  }}
+                                  transition={{
+                                    duration: 3,
+                                    repeat: Infinity,
+                                    ease: "easeInOut",
+                                    delay: idx * 0.75
+                                  }}
+                                />
+                              </g>
+                            );
+                          })}
+                        </svg>
+
+                        {/* Nodes Overlay */}
+                        {[
+                          { id: "orchestrator", label: "Orchestrator", x: 160, y: 120, size: 18, color: "#6366f1", icon: <Terminal size={14} /> },
+                          { id: "rag", label: "RAG DB", x: 60, y: 50, size: 15, color: "#ec4899", icon: <Sparkles size={12} /> },
+                          { id: "seo", label: "SEO Swarm", x: 260, y: 50, size: 15, color: "#06b6d4", icon: <Layers size={12} /> },
+                          { id: "forecaster", label: "Nexus", x: 260, y: 190, size: 15, color: "#818cf8", icon: <Cpu size={12} /> },
+                          { id: "voice", label: "Voice AI", x: 60, y: 190, size: 15, color: "#fda4af", icon: <MessageSquare size={11} /> }
+                        ].map((node) => {
+                          const isSelected = activeAgentNode === node.id;
+                          return (
+                            <motion.button
+                              key={node.id}
+                              onClick={() => setActiveAgentNode(node.id)}
+                              className="swarm-node"
+                              style={{
+                                position: 'absolute',
+                                left: `${node.x / 320 * 100}%`,
+                                top: `${node.y / 240 * 100}%`,
+                                transform: 'translate(-50%, -50%)',
+                                width: `${node.size * 2}px`,
+                                height: `${node.size * 2}px`,
+                                borderRadius: '50%',
+                                background: isSelected ? node.color : 'rgba(15, 15, 25, 0.9)',
+                                border: `1.5px solid ${node.color}`,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                boxShadow: isSelected 
+                                  ? `0 0 20px ${node.color}` 
+                                  : `0 0 10px rgba(0,0,0,0.5)`,
+                                zIndex: 20,
+                                color: isSelected ? '#000000' : '#ffffff',
+                              }}
+                              whileHover={{ scale: 1.15 }}
+                              whileTap={{ scale: 0.95 }}
+                            >
+                              {node.icon}
+                              {/* Glowing Outer Ring for active node */}
+                              {isSelected && (
+                                <motion.span 
+                                  className="absolute inset-0 rounded-full"
+                                  style={{ border: `1px solid ${node.color}` }}
+                                  animate={{ scale: [1, 1.4, 1], opacity: [0.6, 0, 0.6] }}
+                                  transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+                                />
+                              )}
+                            </motion.button>
+                          );
+                        })}
+
+                        <div style={{
+                          position: 'absolute',
+                          bottom: '10px',
+                          left: '12px',
+                          fontSize: '0.65rem',
+                          color: '#64748b',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.3rem'
+                        }}>
+                          <span style={{ width: '6px', height: '6px', background: '#10b981', borderRadius: '50%', display: 'inline-block' }}></span>
+                          Live Swarm Simulation Active
+                        </div>
+                      </div>
+
+                      {/* Selected Node Inspector Panel */}
+                      {agentNodes.find(n => n.id === activeAgentNode) && (() => {
+                        const selectedNode = agentNodes.find(n => n.id === activeAgentNode)!;
+                        return (
+                          <motion.div 
+                            key={selectedNode.id}
+                            initial={{ opacity: 0, y: 15 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            style={{
+                              background: 'rgba(10, 10, 16, 0.95)',
+                              borderTop: '1px solid rgba(255, 255, 255, 0.04)',
+                              padding: '1.2rem 1.5rem',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              gap: '0.3rem',
+                            }}
+                          >
+                            <div className="flex" style={{ justifyContent: 'space-between', alignItems: 'center' }}>
+                              <span style={{ fontWeight: 800, color: '#f8fafc', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                                <span style={{ width: '8px', height: '8px', background: selectedNode.color, borderRadius: '50%', display: 'inline-block', boxShadow: `0 0 8px ${selectedNode.color}` }}></span>
+                                {selectedNode.label}
+                              </span>
+                              <span className="tag" style={{ fontSize: '0.65rem', padding: '0.1rem 0.5rem', background: `${selectedNode.color}15`, borderColor: `${selectedNode.color}30`, color: selectedNode.color }}>
+                                {selectedNode.metric}
+                              </span>
+                            </div>
+                            <p style={{ fontSize: '0.8rem', color: '#94a3b8', lineHeight: 1.4 }}>
+                              {selectedNode.desc}
+                            </p>
+                            <div style={{ marginTop: '0.3rem', display: 'flex', flexDirection: 'column', gap: '0.1rem' }}>
+                              {selectedNode.logs.map((log, lIdx) => (
+                                <div key={lIdx} style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: '#64748b' }}>
+                                  <span style={{ color: selectedNode.color }}>&gt;</span> {log}
+                                </div>
+                              ))}
+                            </div>
+                          </motion.div>
+                        );
+                      })()}
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="cli-interface"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className="terminal-body">
+                        {terminalHistory.map((line, idx) => (
+                          <div 
+                            key={idx} 
+                            className="terminal-output" 
+                            style={{ 
+                              color: line.type === 'error' ? '#f87171' : 
+                                     line.type === 'success' ? 'var(--primary-bright)' : 
+                                     line.type === 'input' ? '#ffffff' : '#94a3b8'
+                            }}
+                          >
+                            {line.text}
+                          </div>
+                        ))}
+                        <div ref={terminalEndRef}></div>
+                      </div>
+                      <form onSubmit={handleTerminalSubmit} className="terminal-header" style={{ background: 'rgba(8, 8, 12, 0.95)', borderTop: '1px solid rgba(255,255,255,0.03)', padding: '0.6rem 1.2rem' }}>
+                        <div className="terminal-input-line" style={{ width: '100%' }}>
+                          <span className="terminal-prompt">&gt;</span>
+                          <input 
+                            type="text" 
+                            className="terminal-text-input" 
+                            placeholder="Ask a question or type a command (e.g. 'skills', 'hermes')..."
+                            value={terminalInput}
+                            onChange={(e) => setTerminalInput(e.target.value)}
+                          />
+                        </div>
+                      </form>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             </motion.div>
 
@@ -543,12 +967,12 @@ export default function Home() {
           >
             <AnimatePresence mode="popLayout">
               {filteredProjects.map((proj: Project, idx: number) => (
-                <motion.div
+                <SpotlightCard
                   layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.4 }}
+                  initial={{ opacity: 0, y: 35, scale: 0.95 }}
+                  whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  transition={{ duration: 0.6, type: "spring", stiffness: 100, damping: 15 }}
                   key={proj.title}
                   className="glass-card"
                   style={{ padding: '2rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}
@@ -596,7 +1020,7 @@ export default function Home() {
                       View Source Code <ExternalLink size={14} />
                     </a>
                   </div>
-                </motion.div>
+                </SpotlightCard>
               ))}
             </AnimatePresence>
           </motion.div>
@@ -675,16 +1099,17 @@ export default function Home() {
                 {idx % 2 === 0 ? (
                   <>
                     <div className="timeline-content-left">
-                      <span className="tag" style={{ background: 'rgba(0, 240, 255, 0.05)', color: 'var(--primary)', fontWeight: 600, fontSize: '0.8rem' }}>
+                      <span className="tag" style={{ background: 'rgba(99, 102, 241, 0.05)', color: 'var(--primary)', fontWeight: 600, fontSize: '0.8rem' }}>
                         {item.date}
                       </span>
                     </div>
                     <div className="timeline-content-right">
-                      <motion.div
+                      <SpotlightCard
                         initial={{ opacity: 0, x: 20 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
-                        transition={{ duration: 0.5 }}
+                        transition={{ duration: 0.6, type: "spring", stiffness: 100, damping: 15 }}
+                        whileHover={{ scale: 1.01, y: -2 }}
                         className="glass-card"
                         style={{ padding: '2rem' }}
                       >
@@ -700,17 +1125,18 @@ export default function Home() {
                         <p style={{ color: '#a1a1aa', fontSize: '0.95rem', lineHeight: 1.6 }}>
                           {item.description}
                         </p>
-                      </motion.div>
+                      </SpotlightCard>
                     </div>
                   </>
                 ) : (
                   <>
                     <div className="timeline-content-left" style={{ marginLeft: 0 }}>
-                      <motion.div
+                      <SpotlightCard
                         initial={{ opacity: 0, x: -20 }}
                         whileInView={{ opacity: 1, x: 0 }}
                         viewport={{ once: true }}
-                        transition={{ duration: 0.5 }}
+                        transition={{ duration: 0.6, type: "spring", stiffness: 100, damping: 15 }}
+                        whileHover={{ scale: 1.01, y: -2 }}
                         className="glass-card"
                         style={{ padding: '2rem' }}
                       >
@@ -726,10 +1152,10 @@ export default function Home() {
                         <p style={{ color: '#a1a1aa', fontSize: '0.95rem', lineHeight: 1.6 }}>
                           {item.description}
                         </p>
-                      </motion.div>
+                      </SpotlightCard>
                     </div>
                     <div className="timeline-content-right" style={{ textAlign: 'left' }}>
-                      <span className="tag" style={{ background: 'rgba(168, 85, 247, 0.05)', color: 'var(--secondary)', fontWeight: 600, fontSize: '0.8rem' }}>
+                      <span className="tag" style={{ background: 'rgba(236, 72, 153, 0.05)', color: 'var(--secondary)', fontWeight: 600, fontSize: '0.8rem' }}>
                         {item.date}
                       </span>
                     </div>
@@ -771,12 +1197,12 @@ export default function Home() {
                 desc: "Demonstrated systematic vulnerability auditing, defensive firewall designs, and real-time security threat vectors analysis."
               }
             ].map((ach, idx) => (
-              <motion.div
+              <SpotlightCard
                 key={ach.title}
-                initial={{ opacity: 0, scale: 0.95 }}
-                whileInView={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0, y: 25, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                transition={{ duration: 0.6, type: "spring", stiffness: 100, damping: 15, delay: idx * 0.1 }}
                 className="glass-card"
                 style={{ padding: '2.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}
               >
@@ -786,7 +1212,7 @@ export default function Home() {
                   <h4 style={{ color: 'var(--primary)', fontWeight: 600, fontSize: '0.9rem', marginBottom: '1rem' }}>{ach.issuer}</h4>
                   <p style={{ color: '#a1a1aa', fontSize: '0.95rem', lineHeight: 1.6 }}>{ach.desc}</p>
                 </div>
-              </motion.div>
+              </SpotlightCard>
             ))}
           </div>
         </div>
@@ -795,7 +1221,7 @@ export default function Home() {
       {/* Conversion Contact Form */}
       <section className="section" id="contact" style={{ paddingBottom: '120px' }}>
         <div className="container">
-          <div className="glass-card" style={{ padding: '4rem', position: 'relative', overflow: 'hidden' }}>
+          <SpotlightCard id="contact-form-container" className="glass-card" style={{ padding: '4rem', position: 'relative', overflow: 'hidden' }} whileHover={{ scale: 1 }} whileTap={{ scale: 1 }}>
             
             <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '3rem', alignItems: 'center' }}>
               
@@ -809,10 +1235,10 @@ export default function Home() {
                 </p>
 
                 <div className="flex" style={{ flexDirection: 'column', gap: '1.5rem', marginBottom: '2.5rem' }}>
-                  <a href="mailto:tirth.p.patel143@gmail.com" className="flex" style={{ gap: '0.8rem', color: '#a1a1aa', fontSize: '1.05rem', alignItems: 'center', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#00f0ff'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>
+                  <a href="mailto:tirth.p.patel143@gmail.com" className="flex" style={{ gap: '0.8rem', color: '#a1a1aa', fontSize: '1.05rem', alignItems: 'center', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary-bright)'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>
                     <Mail size={20} className="text-gradient" /> tirth.p.patel143@gmail.com
                   </a>
-                  <a href="tel:6353782035" className="flex" style={{ gap: '0.8rem', color: '#a1a1aa', fontSize: '1.05rem', alignItems: 'center', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#00f0ff'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>
+                  <a href="tel:6353782035" className="flex" style={{ gap: '0.8rem', color: '#a1a1aa', fontSize: '1.05rem', alignItems: 'center', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary-bright)'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>
                     <Phone size={20} className="text-gradient" /> +91 6353782035
                   </a>
                   <div className="flex" style={{ gap: '0.8rem', color: '#a1a1aa', fontSize: '1.05rem', alignItems: 'center' }}>
@@ -853,7 +1279,7 @@ export default function Home() {
                       exit={{ opacity: 0 }}
                       style={{ textAlign: 'center', padding: '2rem 0' }}
                     >
-                      <CheckCircle2 size={60} style={{ color: 'var(--primary)', marginBottom: '1.5rem', margin: '0 auto', filter: 'drop-shadow(0 0 10px rgba(0, 240, 255, 0.4))' }} />
+                      <CheckCircle2 size={60} style={{ color: 'var(--primary)', marginBottom: '1.5rem', margin: '0 auto', filter: 'drop-shadow(0 0 10px rgba(99, 102, 241, 0.4))' }} />
                       <h3 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: '0.8rem' }}>Transmission Received!</h3>
                       <p style={{ color: '#a1a1aa', lineHeight: 1.6 }}>
                         Thank you for getting in touch. I will read your message and respond via email within 24 hours. Let's make something amazing.
@@ -919,7 +1345,7 @@ export default function Home() {
               </div>
 
             </div>
-          </div>
+          </SpotlightCard>
         </div>
       </section>
 
@@ -937,6 +1363,63 @@ export default function Home() {
           </p>
         </div>
       </footer>
+
+      {/* Custom Cursor Overlay */}
+      {hasPointer && (
+        <>
+          <motion.div
+            style={{
+              position: "fixed",
+              left: cursorXSpring,
+              top: cursorYSpring,
+              width: isHovered ? 64 : 32,
+              height: isHovered ? 64 : 32,
+              borderRadius: "50%",
+              border: `1.5px solid ${isHovered ? 'var(--primary)' : 'rgba(255, 255, 255, 0.25)'}`,
+              backgroundColor: isHovered ? 'rgba(99, 102, 241, 0.05)' : 'transparent',
+              boxShadow: isHovered ? '0 0 20px rgba(99, 102, 241, 0.15)' : 'none',
+              pointerEvents: "none",
+              zIndex: 9999,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "var(--primary-bright)",
+              fontSize: "0.65rem",
+              fontWeight: 800,
+              letterSpacing: "0.1em",
+              marginLeft: isHovered ? -16 : 0,
+              marginTop: isHovered ? -16 : 0,
+              transition: "width 0.2s ease, height 0.2s ease, background-color 0.2s ease, margin 0.2s ease",
+            }}
+          >
+            {isHovered && hoverText && (
+              <motion.span
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+              >
+                {hoverText}
+              </motion.span>
+            )}
+          </motion.div>
+          
+          <motion.div
+            style={{
+              position: "fixed",
+              left: cursorX,
+              top: cursorY,
+              transform: "translate(12px, 12px)",
+              width: 8,
+              height: 8,
+              borderRadius: "50%",
+              backgroundColor: "var(--primary-bright)",
+              boxShadow: "0 0 8px var(--primary)",
+              pointerEvents: "none",
+              zIndex: 10000,
+            }}
+          />
+        </>
+      )}
     </main>
   );
 }
