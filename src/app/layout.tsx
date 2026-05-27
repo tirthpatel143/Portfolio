@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  twitter: { card: "summary_large_image", title: "Tirth Patel | Software Engineer & AI Orchestrator", description: "Portfolio of Tirth Patel, specializing in autonomous AI swarms, distributed systems, and premium web experiences." },
   title: "Tirth Patel | Software Engineer & AI Orchestrator",
   description: "Portfolio of Tirth Patel, specializing in autonomous AI swarms, distributed systems, and premium web experiences.",
   verification: {
