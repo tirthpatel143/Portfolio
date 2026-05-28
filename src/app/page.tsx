@@ -952,12 +952,12 @@ export default function Home() {
             </span>
           </div>
           <div className="flex nav-links" style={{ gap: '2rem', alignItems: 'center' }}>
-            <a href="#about" style={{ fontWeight: 500, fontSize: '0.95rem', color: '#a1a1aa', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#00f0ff'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>About</a>
-            <a href="#projects" style={{ fontWeight: 500, fontSize: '0.95rem', color: '#a1a1aa', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#00f0ff'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>Projects</a>
-            <a href="#skills" style={{ fontWeight: 500, fontSize: '0.95rem', color: '#a1a1aa', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#00f0ff'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>Skills</a>
-            <a href="#timeline" style={{ fontWeight: 500, fontSize: '0.95rem', color: '#a1a1aa', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#00f0ff'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>Experience</a>
-            <a href="#articles" style={{ fontWeight: 500, fontSize: '0.95rem', color: '#a1a1aa', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#00f0ff'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>Articles</a>
-            <a href="#contact" className="btn btn-primary" style={{ padding: '0.5rem 1.2rem', fontSize: '0.85rem', borderRadius: '10px' }}>
+            <a href="#about" title="Go to About Tirth Patel section" style={{ fontWeight: 500, fontSize: '0.95rem', color: '#a1a1aa', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#00f0ff'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>About</a>
+            <a href="#projects" title="View Tirth Patel's software projects portfolio" style={{ fontWeight: 500, fontSize: '0.95rem', color: '#a1a1aa', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#00f0ff'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>Projects</a>
+            <a href="#skills" title="Inspect Tirth Patel's technical arsenal and skills stack" style={{ fontWeight: 500, fontSize: '0.95rem', color: '#a1a1aa', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#00f0ff'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>Skills</a>
+            <a href="#timeline" title="View Tirth Patel's professional work experience and academic timeline" style={{ fontWeight: 500, fontSize: '0.95rem', color: '#a1a1aa', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#00f0ff'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>Experience</a>
+            <a href="#articles" title="Read Tirth Patel's technical writing and blog insights" style={{ fontWeight: 500, fontSize: '0.95rem', color: '#a1a1aa', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#00f0ff'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>Articles</a>
+            <a href="#contact" title="Go to Contact Coordinates section to message Tirth Patel" className="btn btn-primary" style={{ padding: '0.5rem 1.2rem', fontSize: '0.85rem', borderRadius: '10px' }}>
               Say Hello
             </a>
           </div>
@@ -990,10 +990,10 @@ export default function Home() {
               </p>
               
               <div className="flex" style={{ gap: '1rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
-                <a href="#projects" className="btn btn-primary">
+                <a href="#projects" title="Explore Tirth Patel's portfolio projects" className="btn btn-primary">
                   Explore Work <ArrowRight size={18} />
                 </a>
-                <a href="#contact" className="btn btn-outline">
+                <a href="#contact" title="Contact Tirth Patel directly" className="btn btn-outline">
                   Contact Coordinates
                 </a>
               </div>
@@ -1379,6 +1379,7 @@ export default function Home() {
                         rel="noopener noreferrer"
                         className="btn btn-primary"
                         style={{ alignSelf: 'flex-start', background: `linear-gradient(135deg, ${selectedDeckProjectColor}, rgba(0,0,0,0.8))` }}
+                        title={`Inspect source code of ${selectedDeckProject.title} on GitHub`}
                       >
                         Inspect Source Code <ExternalLink size={16} />
                       </a>
@@ -1720,6 +1721,7 @@ export default function Home() {
                         rel="noopener noreferrer"
                         className="btn btn-outline" 
                         style={{ width: '100%', justifyContent: 'center', padding: '0.7rem 1rem', fontSize: '0.9rem' }}
+                        title={`View source code of ${proj.title} on GitHub`}
                       >
                         View Source Code <ExternalLink size={14} />
                       </a>
@@ -2046,12 +2048,14 @@ export default function Home() {
                         <img
                           src={art.image}
                           alt={art.imageAlt}
+                          title={art.imageAlt}
                           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                         />
                       ) : (
                         <Image
                           src={art.image}
                           alt={art.imageAlt}
+                          title={art.imageAlt}
                           fill
                           style={{ objectFit: 'cover' }}
                         />
@@ -2191,6 +2195,7 @@ export default function Home() {
                   <Image
                     src={selectedArticle.image}
                     alt={selectedArticle.imageAlt}
+                    title={selectedArticle.imageAlt}
                     fill
                     style={{ objectFit: 'cover' }}
                   />
@@ -2228,10 +2233,10 @@ export default function Home() {
                 </p>
 
                 <div className="flex" style={{ flexDirection: 'column', gap: '1.5rem', marginBottom: '2.5rem' }}>
-                  <a href="mailto:tirth.p.patel143@gmail.com" className="flex" style={{ gap: '0.8rem', color: '#a1a1aa', fontSize: '1.05rem', alignItems: 'center', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary-bright)'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>
+                  <a href="mailto:tirth.p.patel143@gmail.com" title="Email Tirth Patel directly at tirth.p.patel143@gmail.com" className="flex" style={{ gap: '0.8rem', color: '#a1a1aa', fontSize: '1.05rem', alignItems: 'center', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary-bright)'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>
                     <Mail size={20} className="text-gradient" /> tirth.p.patel143@gmail.com
                   </a>
-                  <a href="tel:6353782035" className="flex" style={{ gap: '0.8rem', color: '#a1a1aa', fontSize: '1.05rem', alignItems: 'center', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary-bright)'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>
+                  <a href="tel:6353782035" title="Call Tirth Patel at +91 6353782035" className="flex" style={{ gap: '0.8rem', color: '#a1a1aa', fontSize: '1.05rem', alignItems: 'center', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = 'var(--primary-bright)'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>
                     <Phone size={20} className="text-gradient" /> +91 6353782035
                   </a>
                   <div className="flex" style={{ gap: '0.8rem', color: '#a1a1aa', fontSize: '1.05rem', alignItems: 'center' }}>
@@ -2246,6 +2251,7 @@ export default function Home() {
                     rel="noopener noreferrer"
                     className="btn btn-outline" 
                     style={{ padding: '0.6rem 1.2rem', borderRadius: '10px', fontSize: '0.9rem', gap: '0.5rem' }}
+                    title="View Tirth Patel's GitHub Profile"
                   >
                     <GithubIcon size={16} /> GitHub
                   </a>
@@ -2255,6 +2261,7 @@ export default function Home() {
                     rel="noopener noreferrer"
                     className="btn btn-outline" 
                     style={{ padding: '0.6rem 1.2rem', borderRadius: '10px', fontSize: '0.9rem', gap: '0.5rem' }}
+                    title="Connect with Tirth Patel on LinkedIn"
                   >
                     <LinkedInIcon size={16} /> LinkedIn
                   </a>
