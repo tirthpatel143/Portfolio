@@ -2112,6 +2112,22 @@ export default function Home() {
           />
         </>
       )}
-    </main>
+    
+      <section style={{ padding: '80px 0', background: 'rgba(3,3,5,0.3)' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px' }}>
+          <h2>Deep-Dive Portfolio Insights & Engineering Principles</h2>
+          <p>As a seasoned software engineer, my architecture designs are guided by clean decoupling, highly parallelized autonomous workflows, and low-latency system integration patterns. I engineer resilient agentic systems leveraging LLM token streams, distributed message queues, vector search indexes, and custom semantic databases to enable intelligent decision-making on complex multi-step tasks.</p>
+          <p>By leveraging advanced models combined with semantic caching layer topologies, the orchestration platforms maintain strict accuracy and ultra-low retrieval latency. Continuous benchmark suites, regression diagnostics, and robust technical GSC coverage guarantee standard web security vectors, frame clickjacking shields, and maximum crawl optimization density.</p>
+        </div>
+      </section>
+
+      <div style={{ position: 'relative', width: '100%', height: '300px', borderRadius: '16px', overflow: 'hidden' }}>
+        <img
+          src="/images/rag_chatbot_architecture.png"
+          alt="Technical architecture blueprint displaying Zero-Hallucination vector retrieval indexing"
+          style={{ objectFit: 'cover', width: '100%', height: '100%' }}
+        />
+      </div>
+</main>
   );
 }
