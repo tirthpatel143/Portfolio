@@ -627,7 +627,12 @@ export default function Home() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      setHasPointer(window.matchMedia("(pointer: fine)").matches);
+      try {
+        const mediaQuery = window.matchMedia ? window.matchMedia("(pointer: fine)") : null;
+        setHasPointer(mediaQuery ? mediaQuery.matches : false);
+      } catch (e) {
+        setHasPointer(false);
+      }
     }
   }, []);
 
