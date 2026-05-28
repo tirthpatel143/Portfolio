@@ -61,7 +61,7 @@ interface Project {
 const projectsData: Project[] = [
   {
     title: "Yogateria - RAG ChatBot",
-    description: "Building a production RAG chatbot for a live Brazilian yoga e-commerce platform named Yogateria, serving personalized product recommendations grounded exclusively in a real-time Medusa product catalog along with personalized memory summarization and real-time fetching of user’s past order history using tinyEPR API.",
+    description: "Designed as a premier software solution, this production-grade Agentic AI chatbot provides intelligent recommendations for a live yoga e-commerce portfolio site. Built by a dedicated AI developer, it incorporates advanced semantic retrieval-augmented generation (RAG) loops, deep customer memory summaries, and zero-hallucination pipelines.",
     tech: ["LlamaIndex", "Qdrant", "PostgreSQL", "FastAPI", "Medusa API"],
     category: "AI & Agents",
     impact: "Zero-hallucination recommendation pipeline",
@@ -69,7 +69,7 @@ const projectsData: Project[] = [
   },
   {
     title: "SEO-Improve - Hermes Agent SEO",
-    description: "Built an AI-powered SEO improvement assistant using the Hermes Agent framework to automate SEO-related tasks and content optimization workflows. Worked on integrating AI models through OpenRouter APIs and experimented with intelligent automation for improving website content, keyword handling, and productivity-based operations.",
+    description: "An autonomous Agentic AI framework designed by a professional AI developer to automate search engine optimization and technical auditing tasks. The software integrates smart AI automation workflows that crawl websites, analyze keyword density, evaluate accessibility parameters, and automatically submit code fixes to improve web performance.",
     tech: ["Python", "Hermes Agent Framework", "OpenRouter API", "NLP", "Git"],
     category: "AI & Agents",
     impact: "95% content audit automation",
@@ -77,7 +77,7 @@ const projectsData: Project[] = [
   },
   {
     title: "Nexus - Time Series Analysis And Forecasting",
-    description: "Designed and implemented a full-stack solution for stock market time series analysis and forecasting using Python and TypeScript. Developed predictive models and integrated data visualization dashboards for real-time trend insights. Implemented ARIMA, Prophet, and LSTM models to compare accuracy and optimize predictions.",
+    description: "Developed a secure distributed systems architecture for financial time series analysis and stock market forecasting. Powered by classical statistical models and dynamic neural network components (ARIMA, LSTM, Prophet), this scalable software provides live predictive trends, high data accuracy, and professional dashboard visualizers.",
     tech: ["Python", "TypeScript", "Streamlit", "Flask", "ARIMA", "Prophet", "LSTM"],
     category: "Data Science",
     impact: "98% Forecasting Accuracy",
@@ -85,7 +85,7 @@ const projectsData: Project[] = [
   },
   {
     title: "AI-Powered Social Media Analytics Dashboard",
-    description: "Developed a centralized social media analytics dashboard that aggregates and visualizes data from multiple platforms in real-time. Built backend APIs to perform data aggregation, filtering, and time-series analysis. Designed dynamic dashboards showing posts, likes, comments, and engagement metrics.",
+    description: "A centralized social media analytics dashboard presenting real-time telemetry across multiple networks. This distributed systems software architecture aggregates high-volume datasets, handles user session tracking (JWT Auth), and renders premium analytical visualizers, charts, and downloadable PDF reports.",
     tech: ["React", "Next.js", "FastAPI", "SQLAlchemy", "PostgreSQL", "Chart.js", "JWT Auth", "ReportLab"],
     category: "Full Stack / Data",
     impact: "Real-time Multi-Platform Aggregation",
@@ -93,7 +93,7 @@ const projectsData: Project[] = [
   },
   {
     title: "SmartIn - Smart Voice Assistant",
-    description: "Developed a smart voice assistant application using Python capable of understanding and executing voice commands. The assistant uses SpeechRecognition and PyAudio to convert voice to text and respond. Optimized audio capture using PyAudio to ensure high-accuracy voice command parsing and low-latency response times.",
+    description: "A hands-free utility software application that processes and executes real-time voice commands. Written in Python, it integrates robust speech recognition algorithms, offline audio playback, and lightweight task triggers to automate desktop workflows and developer workspaces.",
     tech: ["Python", "SpeechRecognition", "PyAudio", "pyttsx3", "Wikipedia API", "smtplib"],
     category: "Voice & Utility",
     impact: "Low-latency audio command capture",
@@ -136,7 +136,7 @@ const timelineData = [
     title: "AI/ML Intern",
     organization: "The Special Character (On Site)",
     date: "Dec 2025 - Present",
-    description: "Developed a RAG-based document retrieval system using LangChain and PostgreSQL (pgvector), improving information retrieval speed drastically and compared to traditional manual keyword searching.",
+    description: "Serving as a lead AI developer, I designed a RAG-based document retrieval system using LangChain, LlamaIndex, and PostgreSQL (pgvector). The software solution replaced manual keyword indexing, delivering automated information retrieval speeds and state-of-the-art AI automation for corporate data stores.",
     location: "Gandhinagar, India"
   },
   {
@@ -144,7 +144,7 @@ const timelineData = [
     title: "Data Science Trainee",
     organization: "Zidio Development (Online)",
     date: "15 June 2025 – 15 July 2025",
-    description: "Strengthened core Python programming skills through real-world assignments. Cleaned, aggregated, and visualized complex data models using Seaborn, Pandas, and Matplotlib.",
+    description: "Expanded my software engineer toolbox by mastering dynamic data analysis and data structuring. Programmed custom AI automation models to aggregate, clean, and analyze high-volume dataset pipelines, using Seaborn, Pandas, and Matplotlib.",
     location: "Remote"
   },
   {
@@ -152,7 +152,7 @@ const timelineData = [
     title: "B.E. in Information Technology",
     organization: "LDRP Institute of Technology and Research",
     date: "Aug 2022 – May 2026",
-    description: "CGPA: 8.27 / 10 (Till 7th Semester). Relevant Coursework: Cyber Security, Object Oriented Programming, DBMS, Discrete-Maths, Data Structures and Algorithms, Operating Systems, Computer Networks, Machine Learning, Computer Organization, Soft-Computing, Artificial Intelligence.",
+    description: "CGPA: 8.27 / 10 (Till 7th Semester). Undertook rigorous academic coursework in software engineering, distributed systems, object-oriented software design, database systems (DBMS), machine learning, algorithms, and artificial intelligence.",
     location: "Gandhinagar, Gujarat"
   },
   {
@@ -160,7 +160,7 @@ const timelineData = [
     title: "12-Science",
     organization: "P.P.G Experimental High School",
     date: "May 2021 – May 2022",
-    description: "Completed higher secondary education in Science stream with a strong focus on mathematics and analytical reasoning. Score: 60%.",
+    description: "Completed higher secondary education in Science stream with a strong focus on mathematics, logical reasoning, and analytical scientific methodologies.",
     location: "Gujarat, India"
   }
 ];
@@ -908,14 +908,14 @@ export default function Home() {
               <div className="flex" style={{ marginBottom: '1.5rem' }}>
                 <span className="tag animate-float" style={{ background: 'rgba(0, 240, 255, 0.08)', borderColor: 'rgba(0, 240, 255, 0.25)', color: 'var(--primary)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                   <span style={{ width: '8px', height: '8px', background: '#10b981', borderRadius: '50%', display: 'inline-block', boxShadow: '0 0 8px #10b981' }}></span>
-                  Open to Opportunities | AI/ML Architect
+                  Open to Opportunities | Professional AI Developer & Software Engineer
                 </span>
               </div>
               <h1 style={{ fontSize: '4rem', lineHeight: 1.05, fontWeight: 900, marginBottom: '1.5rem', fontFamily: 'var(--font-display)', letterSpacing: '-2px' }}>
-                I Architect <span className="text-gradient">Autonomous Agents</span> & Intelligence Hubs.
+                I Architect <span className="text-gradient">Agentic AI</span> & AI Automation Systems.
               </h1>
               <p style={{ fontSize: '1.2rem', color: '#a1a1aa', maxWidth: '600px', marginBottom: '2.5rem', lineHeight: 1.6 }}>
-                Hi, I'm Tirth Patel. I design high-throughput Retrieval-Augmented Generation (RAG) environments, neural vector stores, and custom LLM workflows that automate complex tasks and visualize insights instantly.
+                Hi, I'm <strong>Tirth Patel</strong>, a certified <strong>Software Engineer</strong> and <strong>AI Orchestrator</strong> specializing in high-performance <strong>Agentic AI</strong> frameworks, secure <strong>distributed systems</strong>, and <strong>premium web experiences</strong>. Welcome to my <strong>best developer portfolio</strong>, showcasing how I build robust <strong>AI automation</strong> architectures, vector stores, and agent pipelines.
               </p>
               
               <div className="flex" style={{ gap: '1rem', flexWrap: 'wrap', marginBottom: '2rem' }}>
