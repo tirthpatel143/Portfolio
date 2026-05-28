@@ -609,6 +609,7 @@ export default function Home() {
   // Contact Form State
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [formStatus, setFormStatus] = useState<'idle' | 'sending' | 'success'>('idle');
+  const [selectedArticle, setSelectedArticle] = useState<any | null>(null);
 
   const terminalEndRef = useRef<HTMLDivElement>(null);
 
@@ -879,6 +880,7 @@ export default function Home() {
             <a href="#projects" style={{ fontWeight: 500, fontSize: '0.95rem', color: '#a1a1aa', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#00f0ff'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>Projects</a>
             <a href="#skills" style={{ fontWeight: 500, fontSize: '0.95rem', color: '#a1a1aa', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#00f0ff'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>Skills</a>
             <a href="#timeline" style={{ fontWeight: 500, fontSize: '0.95rem', color: '#a1a1aa', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#00f0ff'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>Experience</a>
+            <a href="#articles" style={{ fontWeight: 500, fontSize: '0.95rem', color: '#a1a1aa', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#00f0ff'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>Articles</a>
             <a href="#contact" className="btn btn-primary" style={{ padding: '0.5rem 1.2rem', fontSize: '0.85rem', borderRadius: '10px' }}>
               Say Hello
             </a>
@@ -1887,6 +1889,221 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Technical Articles & Case Studies Section */}
+      <section className="section" id="articles" style={{ background: 'rgba(3, 3, 5, 0.3)', borderTop: '1px solid var(--glass-border)', paddingBottom: '80px' }}>
+        <div className="container">
+          <div className="flex" style={{ flexDirection: 'column', alignItems: 'center', marginBottom: '4rem', textAlign: 'center' }}>
+            <div className="badge flex flex-center" style={{ gap: '0.5rem', marginBottom: '1.2rem', borderColor: 'rgba(99, 102, 241, 0.2)', color: 'var(--primary)' }}>
+              <Terminal size={14} /> TECHNICAL WRITING
+            </div>
+            <h2 style={{ fontSize: '3rem', fontWeight: 800, marginBottom: '1rem', letterSpacing: '-1px' }}>
+              Featured Insights & <span className="text-gradient">Case Studies</span>
+            </h2>
+            <p style={{ color: '#a1a1aa', fontSize: '1.1rem', maxWidth: '600px' }}>
+              Deep-dives into production architectures, comparative machine learning analyses, and autonomous orchestration framework logic.
+            </p>
+          </div>
+
+          <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2.5rem' }}>
+            {[
+              {
+                title: "Deep-Dive: Building a Zero-Hallucination RAG Chatbot for Yoga E-Commerce",
+                category: "AI & E-Commerce",
+                readTime: "5 min read",
+                desc: "An in-depth architectural breakdown of integrating LlamaIndex, Qdrant Vector database, and Medusa API to serve real-time catalog recommendations with zero hallucination.",
+                color: "#ec4899",
+                image: "/images/rag_chatbot_architecture.png",
+                imageAlt: "Zero-Hallucination RAG Chatbot architecture blueprint integrating LlamaIndex, Qdrant and Medusa E-Commerce catalog indexing",
+                content: "The evolution of e-commerce has transitioned from simple keyword search indexes to highly contextual conversational commerce. In this article, we outline the architecture of Yogateria, a conversational recommendation agent grounded exclusively on real-time Medusa catalogs. The core challenge of modern Retrieval-Augmented Generation (RAG) is mitigating hallucination. To guarantee high fidelity, we constructed a bi-level indexing pipeline using LlamaIndex and a Qdrant Vector database. The catalog data is crawled, parsed, and embedded using dense semantic representations. We leverage pgvector on a localized PostgreSQL instance to aggregate relational parameters like pricing, sizes, and active stock levels. During a query, the LlamaIndex retrieval router performs an initial hybrid vector-keyword match, surfacing candidate nodes with high semantic overlap. Before feeding the candidates to the LLM context window, an adversarial evaluator node compares the surfaced products directly with the current active Medusa store catalog. If a discrepancy in price or inventory is found, the system dynamically patches the LLM context. Furthermore, personalized memories are managed by summarizing past chat flows into a fast-access context store, allowing Yogateria to suggest items based on historical user interactions. The result is a robust conversational engine that drives user conversion while remaining 100% faithful to current storefront inventories."
+              },
+              {
+                title: "ARIMA vs LSTM: Comparing Time-Series Forecasting Models for Stock Market Analysis",
+                category: "Data Science & Finance",
+                readTime: "4 min read",
+                desc: "Analyzing predictive modeling convergence, loss function optimizations, and mathematical trend forecasting comparison for high-accuracy financial time-series visualization.",
+                color: "#38bdf8",
+                image: "/images/stock_forecasting_lstm.png",
+                imageAlt: "Empirical comparison of classical statistical ARIMA forecasting and dynamic neural LSTM time-series analysis for financial market trend prediction",
+                content: "Time-series analysis and stock market forecasting represent a classic battleground between statistical frameworks and deep learning architectures. In our project Nexus, we set out to analyze the empirical differences between classical statistical forecasting (ARIMA, Prophet) and recurrent neural networks (LSTM). Classical models like ARIMA rely heavily on the assumption of stationarity and assume linear relationships between successive observations. They are highly performant on stationary, short-term trends where historical volatility is stable. However, financial markets are characterized by non-linear stochastic behavior, rendering statistical models prone to lag during sudden market shifts. To address this, we developed a multi-layered Long Short-Term Memory (LSTM) network capable of retaining cell state correlations over long sequences. LSTMs solve the vanishing gradient problem of simple recurrent nets by introducing input, forget, and output gates. We trained our LSTM on multi-year daily closing prices, utilizing Adam optimizer with dynamic learning rate scheduling. Our results showed a significant performance disparity: while ARIMA achieved high precision on 1-to-3 day predictions with low computational costs, the LSTM model converged beautifully to identify macro-trends over 30-day horizons, showing a validation loss of just 0.002. Combining both methodologies into a hybrid model provides the ultimate predictive capability, matching low-latency short-term forecasting with high-capacity deep trend analysis."
+              },
+              {
+                title: "Autonomous Orchestration: Multi-Agent Loops and Checklist Fixers in Hermes",
+                category: "AI Swarms & Automation",
+                readTime: "6 min read",
+                desc: "Designing state machine workflows, persistent context routing, and automatic code remediation pipelines for a 17-agent autonomous SEO swarm.",
+                color: "#a855f7",
+                image: "/images/multi_agent_swarm.png",
+                imageAlt: "17-agent autonomous SEO optimization swarm framework loop and supervisor orchestrator flow graph",
+                content: "Multi-agent systems represent the frontier of software engineering, shifting the paradigm from rigid rule-based automation to autonomous goal-oriented loops. The Hermes SEO Agent framework orchestrates a swarm of 17 dedicated worker nodes, each specialized in a specific vertical of digital optimization—from indexing inspections to canonical audits. The system runs on an autonomous lifecycle loop managed by a central supervisor node. Worker agents communicate by publishing structured checkpoints to a centralized state gateway. The supervisor evaluates these checkpoints against the project's global manifest file to detect blockers or runtime discrepancies. If a worker gets blocked, the orchestrator dynamically re-routes the task context to an expert troubleshooter node or flags it for human feedback on the glassmorphic dashboard. When an audit crawls an error (for instance, a missing meta tag or clickjacking vulnerability), the system doesn't just log it—it calls the GitHub Fixer pipeline. The fixer dynamically parses Next.js App Router files (like layout.tsx layouts and next.config.ts configuration blocks), performs precise code updates without modifying unrelated project files, and triggers automated pull requests. By shifting from manual technical inspections to continuous autonomous swarm loops, we establish a self-healing website optimization workflow that reduces developer operational overhead by 95."
+              }
+            ].map((art, idx) => (
+              <SpotlightCard
+                key={art.title}
+                initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.55, type: "spring", stiffness: 90, damping: 14, delay: idx * 0.1 }}
+                className="glass-card"
+                style={{ padding: '2.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', borderTop: `3px solid ${art.color}` }}
+              >
+                <div>
+                  {art.image && (
+                    <div style={{ position: 'relative', width: '100%', height: '180px', borderRadius: '12px', overflow: 'hidden', marginBottom: '1.5rem', border: '1px solid rgba(255,255,255,0.06)' }}>
+                      <Image
+                        src={art.image}
+                        alt={art.imageAlt}
+                        fill
+                        style={{ objectFit: 'cover' }}
+                      />
+                    </div>
+                  )}
+                  <div className="flex" style={{ justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem' }}>
+                    <span style={{ fontSize: '0.8rem', fontWeight: 700, color: art.color, background: `${art.color}12`, padding: '0.35rem 0.8rem', borderRadius: '8px', border: `1px solid ${art.color}25` }}>
+                      {art.category}
+                    </span>
+                    <span style={{ fontSize: '0.8rem', color: '#71717a' }}>{art.readTime}</span>
+                  </div>
+                  <h3 style={{ fontSize: '1.35rem', fontWeight: 800, marginBottom: '1rem', lineHeight: 1.4, color: '#ffffff' }}>{art.title}</h3>
+                  <p style={{ color: '#a1a1aa', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '2rem' }}>{art.desc}</p>
+                </div>
+                <button
+                  onClick={() => setSelectedArticle(art)}
+                  className="flex flex-center"
+                  style={{
+                    width: '100%',
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px solid rgba(255,255,255,0.06)',
+                    color: '#ffffff',
+                    padding: '0.85rem',
+                    borderRadius: '12px',
+                    fontWeight: 700,
+                    fontSize: '0.9rem',
+                    gap: '0.5rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.3s'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = art.color;
+                    e.currentTarget.style.borderColor = art.color;
+                    e.currentTarget.style.boxShadow = `0 10px 25px ${art.color}35`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)';
+                    e.currentTarget.style.boxShadow = 'none';
+                  }}
+                >
+                  Read Article <ArrowRight size={16} />
+                </button>
+              </SpotlightCard>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Interactive Article Modal */}
+      <AnimatePresence>
+        {selectedArticle && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(3, 3, 5, 0.85)',
+              backdropFilter: 'blur(16px)',
+              zIndex: 9999,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '2rem'
+            }}
+            onClick={() => setSelectedArticle(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, y: 20, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.9, y: 20, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              style={{
+                width: '100%',
+                maxWidth: '750px',
+                background: 'rgba(10, 10, 16, 0.98)',
+                border: `1.5px solid ${selectedArticle.color}40`,
+                boxShadow: `0 30px 60px rgba(0,0,0,0.8), 0 0 40px ${selectedArticle.color}15`,
+                borderRadius: '24px',
+                padding: '3rem',
+                position: 'relative',
+                maxHeight: '90vh',
+                overflowY: 'auto'
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => setSelectedArticle(null)}
+                style={{
+                  position: 'absolute',
+                  top: '20px',
+                  right: '20px',
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid rgba(255,255,255,0.08)',
+                  color: '#a1a1aa',
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  fontWeight: 800
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
+                  e.currentTarget.style.color = '#ffffff';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
+                  e.currentTarget.style.color = '#a1a1aa';
+                }}
+              >
+                ✕
+              </button>
+
+              <div className="flex" style={{ gap: '1rem', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: selectedArticle.color, background: `${selectedArticle.color}12`, padding: '0.4rem 0.9rem', borderRadius: '8px', border: `1px solid ${selectedArticle.color}25` }}>
+                  {selectedArticle.category}
+                </span>
+                <span style={{ fontSize: '0.85rem', color: '#71717a' }}>{selectedArticle.readTime}</span>
+              </div>
+
+              {selectedArticle.image && (
+                <div style={{ position: 'relative', width: '100%', height: '280px', borderRadius: '16px', overflow: 'hidden', marginBottom: '2rem', border: '1px solid rgba(255,255,255,0.08)' }}>
+                  <Image
+                    src={selectedArticle.image}
+                    alt={selectedArticle.imageAlt}
+                    fill
+                    style={{ objectFit: 'cover' }}
+                  />
+                </div>
+              )}
+
+              <h2 style={{ fontSize: '2.2rem', fontWeight: 900, marginBottom: '2rem', lineHeight: 1.3, letterSpacing: '-0.5px', color: '#ffffff' }}>
+                {selectedArticle.title}
+              </h2>
+
+              <div style={{ color: '#e4e4e7', fontSize: '1.05rem', lineHeight: 1.8, fontWeight: 400, fontFamily: 'var(--font-sans)', textAlign: 'justify' }}>
+                {selectedArticle.content.split('\n\n').map((para: string, pIdx: number) => (
+                  <p key={pIdx} style={{ marginBottom: '1.5rem' }}>{para}</p>
+                ))}
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Conversion Contact Form */}
       <section className="section" id="contact" style={{ paddingBottom: '120px' }}>
