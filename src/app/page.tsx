@@ -1678,75 +1678,122 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '2.5rem' }}>
-            {skillCategories.map((cat, i) => (
-              <SpotlightCard
-                key={cat.title}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-                className="glass-card"
-                style={{ padding: '2.5rem', display: 'flex', flexDirection: 'column', height: '100%', position: 'relative', overflow: 'hidden' }}
-              >
-                {/* Dynamic theme glow background element */}
+          <div className="skills-marquee-container">
+            {/* Row 1: Left to Right Marquee */}
+            <div className="skills-marquee-track">
+              {[
+                { name: "LangChain", color: "#6366f1" },
+                { name: "LlamaIndex", color: "#6366f1" },
+                { name: "RAG Systems", color: "#6366f1" },
+                { name: "Hermes Agent Framework", color: "#6366f1" },
+                { name: "Python", color: "#ec4899" },
+                { name: "FastAPI", color: "#ec4899" },
+                { name: "PostgreSQL (pgvector)", color: "#ec4899" },
+                { name: "Qdrant Vector DB", color: "#ec4899" },
+                { name: "N8N Swarms", color: "#06b6d4" },
+                { name: "Docker Platforms", color: "#06b6d4" },
+                { name: "GitHub Workflows", color: "#06b6d4" },
+                { name: "Google Analytics 4", color: "#06b6d4" },
+                { name: "Next.js", color: "#a855f7" },
+                { name: "React", color: "#a855f7" },
+                { name: "TypeScript", color: "#a855f7" },
+                { name: "Tailwind CSS", color: "#a855f7" },
+                // Duplicate for seamless looping
+                { name: "LangChain", color: "#6366f1" },
+                { name: "LlamaIndex", color: "#6366f1" },
+                { name: "RAG Systems", color: "#6366f1" },
+                { name: "Hermes Agent Framework", color: "#6366f1" },
+                { name: "Python", color: "#ec4899" },
+                { name: "FastAPI", color: "#ec4899" },
+                { name: "PostgreSQL (pgvector)", color: "#ec4899" },
+                { name: "Qdrant Vector DB", color: "#ec4899" },
+                { name: "N8N Swarms", color: "#06b6d4" },
+                { name: "Docker Platforms", color: "#06b6d4" },
+                { name: "GitHub Workflows", color: "#06b6d4" },
+                { name: "Google Analytics 4", color: "#06b6d4" },
+                { name: "Next.js", color: "#a855f7" },
+                { name: "React", color: "#a855f7" },
+                { name: "TypeScript", color: "#a855f7" },
+                { name: "Tailwind CSS", color: "#a855f7" }
+              ].map((skill, idx) => (
                 <div 
-                  style={{ 
-                    position: 'absolute', 
-                    bottom: '-25%', 
-                    right: '-25%', 
-                    width: '200px', 
-                    height: '200px', 
-                    background: `radial-gradient(circle, ${cat.color}07 0%, transparent 70%)`, 
-                    pointerEvents: 'none',
-                    zIndex: 0
-                  }} 
-                />
-
-                <div className="flex" style={{ alignItems: 'center', gap: '1.2rem', marginBottom: '1.8rem', position: 'relative', zIndex: 2 }}>
-                  <div style={{ 
-                    padding: '0.7rem', 
-                    background: `${cat.color}12`, 
-                    borderRadius: '12px',
-                    border: `1.5px solid ${cat.color}25`,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: cat.color,
-                    boxShadow: `0 0 15px ${cat.color}08`
-                  }}>
-                    {cat.icon}
-                  </div>
-                  <h3 style={{ fontSize: '1.35rem', fontWeight: 800, fontFamily: 'var(--font-display)', color: '#ffffff' }}>{cat.title}</h3>
+                  key={`${skill.name}-row1-${idx}`} 
+                  className="skills-marquee-item"
+                  style={{
+                    borderLeft: `3.5px solid ${skill.color}`,
+                    boxShadow: `0 0 15px ${skill.color}05`
+                  }}
+                >
+                  <span style={{ 
+                    width: '6px', 
+                    height: '6px', 
+                    background: skill.color, 
+                    borderRadius: '50%',
+                    boxShadow: `0 0 8px ${skill.color}`
+                  }} />
+                  {skill.name}
                 </div>
+              ))}
+            </div>
 
-                <div className="flex" style={{ flexWrap: 'wrap', gap: '0.6rem', position: 'relative', zIndex: 2 }}>
-                  {cat.skills.map((skill) => (
-                    <motion.span
-                      whileHover={{ 
-                        scale: 1.05, 
-                        borderColor: cat.color, 
-                        color: '#ffffff',
-                        background: `${cat.color}15`,
-                        boxShadow: `0 0 12px ${cat.color}25`
-                      }}
-                      key={skill}
-                      className="tag"
-                      style={{ 
-                        cursor: 'default', 
-                        fontWeight: 600, 
-                        fontSize: '0.8rem',
-                        borderColor: 'rgba(255,255,255,0.04)',
-                        background: 'rgba(255,255,255,0.01)',
-                        transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)'
-                      }}
-                    >
-                      {skill}
-                    </motion.span>
-                  ))}
+            {/* Row 2: Right to Left Marquee */}
+            <div className="skills-marquee-track-reverse">
+              {[
+                { name: "Prompt Engineering", color: "#6366f1" },
+                { name: "OpenAI & OpenRouter APIs", color: "#6366f1" },
+                { name: "OpenCV Computer Vision", color: "#6366f1" },
+                { name: "Scikit-Learn ML", color: "#6366f1" },
+                { name: "SQL Databases", color: "#ec4899" },
+                { name: "Flask APIs", color: "#ec4899" },
+                { name: "MySQL Server", color: "#ec4899" },
+                { name: "Faiss Indexing", color: "#ec4899" },
+                { name: "MeiliSearch Engines", color: "#06b6d4" },
+                { name: "Power BI Analytics", color: "#06b6d4" },
+                { name: "Pandas Statistics", color: "#06b6d4" },
+                { name: "NumPy Computations", color: "#06b6d4" },
+                { name: "Seaborn Graphs", color: "#06b6d4" },
+                { name: "HTML5 Layouts", color: "#a855f7" },
+                { name: "CSS3 Styling", color: "#a855f7" },
+                { name: "JavaScript Engine", color: "#a855f7" },
+                { name: "Vanilla CSS Systems", color: "#a855f7" },
+                // Duplicate for seamless looping
+                { name: "Prompt Engineering", color: "#6366f1" },
+                { name: "OpenAI & OpenRouter APIs", color: "#6366f1" },
+                { name: "OpenCV Computer Vision", color: "#6366f1" },
+                { name: "Scikit-Learn ML", color: "#6366f1" },
+                { name: "SQL Databases", color: "#ec4899" },
+                { name: "Flask APIs", color: "#ec4899" },
+                { name: "MySQL Server", color: "#ec4899" },
+                { name: "Faiss Indexing", color: "#ec4899" },
+                { name: "MeiliSearch Engines", color: "#06b6d4" },
+                { name: "Power BI Analytics", color: "#06b6d4" },
+                { name: "Pandas Statistics", color: "#06b6d4" },
+                { name: "NumPy Computations", color: "#06b6d4" },
+                { name: "Seaborn Graphs", color: "#06b6d4" },
+                { name: "HTML5 Layouts", color: "#a855f7" },
+                { name: "CSS3 Styling", color: "#a855f7" },
+                { name: "JavaScript Engine", color: "#a855f7" },
+                { name: "Vanilla CSS Systems", color: "#a855f7" }
+              ].map((skill, idx) => (
+                <div 
+                  key={`${skill.name}-row2-${idx}`} 
+                  className="skills-marquee-item"
+                  style={{
+                    borderLeft: `3.5px solid ${skill.color}`,
+                    boxShadow: `0 0 15px ${skill.color}05`
+                  }}
+                >
+                  <span style={{ 
+                    width: '6px', 
+                    height: '6px', 
+                    background: skill.color, 
+                    borderRadius: '50%',
+                    boxShadow: `0 0 8px ${skill.color}`
+                  }} />
+                  {skill.name}
                 </div>
-              </SpotlightCard>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       </section>
