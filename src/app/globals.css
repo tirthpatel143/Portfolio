@@ -87,7 +87,7 @@ body {
 .orb {
   position: absolute;
   border-radius: 50%;
-  filter: blur(140px);
+  /* Removed heavy CPU filter: blur() to avoid continuous rasterization loops */
   z-index: -2;
   opacity: 0.35;
   pointer-events: none;
@@ -97,7 +97,8 @@ body {
 .orb-primary {
   width: 600px;
   height: 600px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, rgba(6, 182, 212, 0.05) 50%, transparent 75%);
+  /* Pre-baked natural blur using soft gradient stops for premium GPU-accelerated performance */
+  background: radial-gradient(circle at center, rgba(99, 102, 241, 0.15) 0%, rgba(99, 102, 241, 0.06) 35%, rgba(6, 182, 212, 0.02) 65%, transparent 100%);
   top: -100px;
   left: -200px;
   animation: floatOrb1 25s ease-in-out infinite alternate;
@@ -106,7 +107,8 @@ body {
 .orb-secondary {
   width: 700px;
   height: 700px;
-  background: radial-gradient(circle, rgba(236, 72, 153, 0.2) 0%, rgba(99, 102, 241, 0.05) 50%, transparent 75%);
+  /* Pre-baked natural blur using soft gradient stops for premium GPU-accelerated performance */
+  background: radial-gradient(circle at center, rgba(236, 72, 153, 0.12) 0%, rgba(236, 72, 153, 0.05) 35%, rgba(99, 102, 241, 0.01) 65%, transparent 100%);
   bottom: 5%;
   right: -300px;
   animation: floatOrb2 30s ease-in-out infinite alternate;
@@ -115,7 +117,8 @@ body {
 .orb-accent {
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, rgba(6, 182, 212, 0.2) 0%, rgba(236, 72, 153, 0.05) 50%, transparent 75%);
+  /* Pre-baked natural blur using soft gradient stops for premium GPU-accelerated performance */
+  background: radial-gradient(circle at center, rgba(6, 182, 212, 0.12) 0%, rgba(6, 182, 212, 0.04) 35%, rgba(236, 72, 153, 0.01) 65%, transparent 100%);
   top: 35%;
   left: 50%;
   transform: translate(-50%, -50%);
@@ -221,10 +224,9 @@ h4,
 
 .text-gradient {
   background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 50%, var(--accent) 100%);
-  background-size: 200% auto;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: gradientFlow 8s linear infinite;
+  /* Removed infinite gradientFlow repaints to keep CPU load at 0% */
 }
 
 .text-gradient-cyan {

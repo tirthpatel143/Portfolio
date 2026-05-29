@@ -601,6 +601,85 @@ const TechStackDock = () => {
   );
 };
 
+// Dynamic Blogs Fetching static source data (moved outside component lifecycle to prevent recreate triggers)
+const initialArticles = [
+  {
+    title: "Deep-Dive: Building a Zero-Hallucination RAG Chatbot for Yoga E-Commerce",
+    category: "AI & E-Commerce",
+    readTime: "5 min read",
+    desc: "An in-depth architectural breakdown of integrating LlamaIndex, Qdrant Vector database, and Medusa API to serve real-time catalog recommendations with zero hallucination.",
+    color: "#ec4899",
+    image: "/images/rag_chatbot_architecture.png",
+    imageAlt: "Zero-Hallucination RAG Chatbot architecture blueprint integrating LlamaIndex, Qdrant and Medusa E-Commerce catalog indexing",
+    isExternal: false,
+    url: "",
+    sections: [
+      {
+        heading: "1. The E-Commerce Recommendation Paradigm",
+        text: "Modern e-commerce has evolved beyond standard keyword-based filters. Users now expect seamless, interactive, conversational search systems that understand user intent. For Yogateria, a dynamic yoga storefront, the key goal was creating a digital recommendations advisor grounded entirely on the active inventory catalog database."
+      },
+      {
+        heading: "2. The Technical Blueprint & RAG Orchestration",
+        text: "To eliminate the major downside of LLMs (knowledge hallucination), we implemented a customized Retrieval-Augmented Generation (RAG) system using LlamaIndex. Our backend orchestrator indexes product nodes into a highly optimized Qdrant Vector database, representing product attributes, descriptions, and materials in high-dimensional dense embeddings."
+      },
+      {
+        heading: "3. Adversarial Inventory Auditing",
+        text: "To guarantee that our agent never recommends a product that is out of stock or displays incorrect pricing, we integrated an adversarial validator layer. This node intercepts candidates retrieved by the vector index and queries live Medusa APIs to compare active pricing and stock levels in real time. If a discrepancy is found, the node dynamically injects warning patches to keep the model aligned with reality."
+      }
+    ]
+  },
+  {
+    title: "ARIMA vs LSTM: Comparing Time-Series Forecasting Models for Stock Market Analysis",
+    category: "Data Science & Finance",
+    readTime: "4 min read",
+    desc: "Analyzing predictive modeling convergence, loss function optimizations, and mathematical trend forecasting comparison for high-accuracy financial time-series visualization.",
+    color: "#38bdf8",
+    image: "/images/stock_forecasting_lstm.png",
+    imageAlt: "Empirical comparison of classical statistical ARIMA forecasting and dynamic neural LSTM time-series analysis for financial market trend prediction",
+    isExternal: false,
+    url: "",
+    sections: [
+      {
+        heading: "1. Classical Statistics vs. Recurrent Neural Nets",
+        text: "Predictive financial modeling represents one of the most challenging areas in quantitative analysis. Classical models, like ARIMA, assume stationarity and linear relations in chronological data. Deep learning frameworks, such as Long Short-Term Memory (LSTM) networks, are designed to retain long-term dependencies in chaotic, non-linear sequences."
+      },
+      {
+        heading: "2. LSTM Gate Architecture & Training Mechanics",
+        text: "LSTMs prevent vanishing gradients by using input, forget, and output gates that govern information flow in the memory cell. We trained a multi-layered LSTM using historical closing stock prices, minimizing mean squared error (MSE) loss using the Adam optimizer with customized dynamic learning rate decay structures."
+      },
+      {
+        heading: "3. Empirical Performance Insights",
+        text: "Our research revealed a clear mathematical division. Classical ARIMA models outpace deep nets on short-term horizons (1 to 3 days) where local linear trends are strong. Over longer horizons (30 days), ARIMA lags, whereas our trained LSTM successfully captures structural market trends with an impressive validation loss of 0.002."
+      }
+    ]
+  },
+  {
+    title: "Autonomous Orchestration: Multi-Agent Loops and Checklist Fixers in Hermes",
+    category: "AI Swarms & Automation",
+    readTime: "6 min read",
+    desc: "Designing state machine workflows, persistent context routing, and automatic code remediation pipelines for a 17-agent autonomous SEO swarm.",
+    color: "#a855f7",
+    image: "/images/multi_agent_swarm.png",
+    imageAlt: "17-agent autonomous SEO optimization swarm framework loop and supervisor orchestrator flow graph",
+    isExternal: false,
+    url: "",
+    sections: [
+      {
+        heading: "1. The Multi-Agent Swarm Orchestration Loop",
+        text: "Rigid software automation is giving way to dynamic, multi-agent frameworks capable of planning, inspecting, and reasoning. The Hermes framework organizes 17 autonomous agent nodes into specialized lanes (SEO inspections, semantic audits, metadata audits) overseen by a central Supervisor."
+      },
+      {
+        heading: "2. Smart State Gateways & Checkpoint Blockers",
+        text: "All agent nodes in the swarm publish their atomic updates and actions to a shared State Gateway. The Supervisor continuously evaluates these checkpoints against a global project manifest file. When an agent experiences an API failure or system block, the orchestrator automatically intercepts, routes the task to a troubleshooter node, or surfaces a warning to the dashboard."
+      },
+      {
+        heading: "3. Automated GitHub Fixers (Self-Healing Codebases)",
+        text: "When the crawl agents identify technical deficiencies (like missing meta tags or clickjacking vulnerabilities), Hermes goes a step further than simple logging. It calls the GitHub Fixer module, which performs atomic code updates inside the React layout.tsx files and pushes automated Pull Requests directly to the repository."
+      }
+    ]
+  }
+];
+
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [isScrolled, setIsScrolled] = useState(false);
@@ -628,85 +707,6 @@ export default function Home() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [formStatus, setFormStatus] = useState<'idle' | 'sending' | 'success'>('idle');
   const [selectedArticle, setSelectedArticle] = useState<any | null>(null);
-
-  // Dynamic Blogs Fetching (Dev.to integration)
-  const initialArticles = useMemo(() => [
-    {
-      title: "Deep-Dive: Building a Zero-Hallucination RAG Chatbot for Yoga E-Commerce",
-      category: "AI & E-Commerce",
-      readTime: "5 min read",
-      desc: "An in-depth architectural breakdown of integrating LlamaIndex, Qdrant Vector database, and Medusa API to serve real-time catalog recommendations with zero hallucination.",
-      color: "#ec4899",
-      image: "/images/rag_chatbot_architecture.png",
-      imageAlt: "Zero-Hallucination RAG Chatbot architecture blueprint integrating LlamaIndex, Qdrant and Medusa E-Commerce catalog indexing",
-      isExternal: false,
-      url: "",
-      sections: [
-        {
-          heading: "1. The E-Commerce Recommendation Paradigm",
-          text: "Modern e-commerce has evolved beyond standard keyword-based filters. Users now expect seamless, interactive, conversational search systems that understand user intent. For Yogateria, a dynamic yoga storefront, the key goal was creating a digital recommendations advisor grounded entirely on the active inventory catalog database."
-        },
-        {
-          heading: "2. The Technical Blueprint & RAG Orchestration",
-          text: "To eliminate the major downside of LLMs (knowledge hallucination), we implemented a customized Retrieval-Augmented Generation (RAG) system using LlamaIndex. Our backend orchestrator indexes product nodes into a highly optimized Qdrant Vector database, representing product attributes, descriptions, and materials in high-dimensional dense embeddings."
-        },
-        {
-          heading: "3. Adversarial Inventory Auditing",
-          text: "To guarantee that our agent never recommends a product that is out of stock or displays incorrect pricing, we integrated an adversarial validator layer. This node intercepts candidates retrieved by the vector index and queries live Medusa APIs to compare active pricing and stock levels in real time. If a discrepancy is found, the node dynamically injects warning patches to keep the model aligned with reality."
-        }
-      ]
-    },
-    {
-      title: "ARIMA vs LSTM: Comparing Time-Series Forecasting Models for Stock Market Analysis",
-      category: "Data Science & Finance",
-      readTime: "4 min read",
-      desc: "Analyzing predictive modeling convergence, loss function optimizations, and mathematical trend forecasting comparison for high-accuracy financial time-series visualization.",
-      color: "#38bdf8",
-      image: "/images/stock_forecasting_lstm.png",
-      imageAlt: "Empirical comparison of classical statistical ARIMA forecasting and dynamic neural LSTM time-series analysis for financial market trend prediction",
-      isExternal: false,
-      url: "",
-      sections: [
-        {
-          heading: "1. Classical Statistics vs. Recurrent Neural Nets",
-          text: "Predictive financial modeling represents one of the most challenging areas in quantitative analysis. Classical models, like ARIMA, assume stationarity and linear relations in chronological data. Deep learning frameworks, such as Long Short-Term Memory (LSTM) networks, are designed to retain long-term dependencies in chaotic, non-linear sequences."
-        },
-        {
-          heading: "2. LSTM Gate Architecture & Training Mechanics",
-          text: "LSTMs prevent vanishing gradients by using input, forget, and output gates that govern information flow in the memory cell. We trained a multi-layered LSTM using historical closing stock prices, minimizing mean squared error (MSE) loss using the Adam optimizer with customized dynamic learning rate decay structures."
-        },
-        {
-          heading: "3. Empirical Performance Insights",
-          text: "Our research revealed a clear mathematical division. Classical ARIMA models outpace deep nets on short-term horizons (1 to 3 days) where local linear trends are strong. Over longer horizons (30 days), ARIMA lags, whereas our trained LSTM successfully captures structural market trends with an impressive validation loss of 0.002."
-        }
-      ]
-    },
-    {
-      title: "Autonomous Orchestration: Multi-Agent Loops and Checklist Fixers in Hermes",
-      category: "AI Swarms & Automation",
-      readTime: "6 min read",
-      desc: "Designing state machine workflows, persistent context routing, and automatic code remediation pipelines for a 17-agent autonomous SEO swarm.",
-      color: "#a855f7",
-      image: "/images/multi_agent_swarm.png",
-      imageAlt: "17-agent autonomous SEO optimization swarm framework loop and supervisor orchestrator flow graph",
-      isExternal: false,
-      url: "",
-      sections: [
-        {
-          heading: "1. The Multi-Agent Swarm Orchestration Loop",
-          text: "Rigid software automation is giving way to dynamic, multi-agent frameworks capable of planning, inspecting, and reasoning. The Hermes framework organizes 17 autonomous agent nodes into specialized lanes (SEO inspections, semantic audits, metadata audits) overseen by a central Supervisor."
-        },
-        {
-          heading: "2. Smart State Gateways & Checkpoint Blockers",
-          text: "All agent nodes in the swarm publish their atomic updates and actions to a shared State Gateway. The Supervisor continuously evaluates these checkpoints against a global project manifest file. When an agent experiences an API failure or system block, the orchestrator automatically intercepts, routes the task to a troubleshooter node, or surfaces a warning to the dashboard."
-        },
-        {
-          heading: "3. Automated GitHub Fixers (Self-Healing Codebases)",
-          text: "When the crawl agents identify technical deficiencies (like missing meta tags or clickjacking vulnerabilities), Hermes goes a step further than simple logging. It calls the GitHub Fixer module, which performs atomic code updates inside the React layout.tsx files and pushes automated Pull Requests directly to the repository."
-        }
-      ]
-    }
-  ], []);
 
   const [articles, setArticles] = useState<any[]>(initialArticles);
 
@@ -737,7 +737,7 @@ export default function Home() {
       }
     };
     fetchArticles();
-  }, [initialArticles]);
+  }, []);
 
   const terminalEndRef = useRef<HTMLDivElement>(null);
 
@@ -1140,10 +1140,12 @@ export default function Home() {
                                 <motion.circle
                                   r="3"
                                   fill={line.color}
-                                  initial={{ cx: `${line.from.x / 320 * 100}%`, cy: `${line.from.y / 240 * 100}%` }}
+                                  cx={0}
+                                  cy={0}
+                                  initial={{ x: `${line.from.x / 320 * 100}%`, y: `${line.from.y / 240 * 100}%` }}
                                   animate={{
-                                    cx: [`${line.from.x / 320 * 100}%`, `${line.to.x / 320 * 100}%`],
-                                    cy: [`${line.from.y / 240 * 100}%`, `${line.to.y / 240 * 100}%`]
+                                    x: [`${line.from.x / 320 * 100}%`, `${line.to.x / 320 * 100}%`],
+                                    y: [`${line.from.y / 240 * 100}%`, `${line.to.y / 240 * 100}%`]
                                   }}
                                   transition={{
                                     duration: 3,
@@ -1685,8 +1687,14 @@ export default function Home() {
                               {[8, 22, 12, 38, 26, 45, 18, 30, 10].map((h, wIdx) => (
                                 <motion.div 
                                   key={wIdx} 
-                                  style={{ width: '4px', height: `${h}px`, background: cardColor, borderRadius: '2px' }} 
-                                  animate={{ height: [h, h * 0.4, h] }}
+                                  style={{ 
+                                    width: '4px', 
+                                    height: `${h}px`, 
+                                    background: cardColor, 
+                                    borderRadius: '2px',
+                                    transformOrigin: 'bottom'
+                                  }} 
+                                  animate={{ scaleY: [1, 0.4, 1] }}
                                   transition={{ duration: 1.5, repeat: Infinity, delay: wIdx * 0.15 }}
                                 />
                               ))}
