@@ -749,6 +749,671 @@ const initialArticles = [
   }
 ];
 
+const InteractiveLab = ({ activeIdx, setActiveIdx, openFullModal }: { activeIdx: number; setActiveIdx: (idx: number) => void; openFullModal: (art: any) => void }) => {
+  // RAG Simulator States
+  const [ragPrompt, setRagPrompt] = useState("");
+  const [ragLogs, setRagLogs] = useState<string[]>([]);
+  const [ragStatus, setRagStatus] = useState<"idle" | "running" | "done">("idle");
+  const [ragAnswer, setRagAnswer] = useState("");
+  const ragLogEndRef = useRef<HTMLDivElement>(null);
+
+  // Time Series States
+  const [timeModel, setTimeModel] = useState<"arima" | "lstm">("lstm");
+
+  // Agent Swarm States
+  const [swarmState, setSwarmState] = useState<"idle" | "crawling" | "healing" | "done">("idle");
+  const [swarmLogs, setSwarmLogs] = useState<string[]>([]);
+  const [activeSwarmNode, setActiveSwarmNode] = useState<string | null>(null);
+
+  // Tab View for Details panel (Simulator vs Technical Details)
+  const [activeTab, setActiveTab] = useState<"sim" | "details">("sim");
+
+  const activeArticle = initialArticles[activeIdx];
+
+  // Auto-scroll RAG logs
+  useEffect(() => {
+    if (ragLogEndRef.current) {
+      ragLogEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [ragLogs]);
+
+  // Run RAG simulation
+  const runRagSimulation = async (query: string) => {
+    setRagPrompt(query);
+    setRagStatus("running");
+    setRagLogs([]);
+    setRagAnswer("");
+
+    const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    const steps = [
+      { msg: `⚡ QUERY INTERCEPTED: "${query}"`, delay: 600 },
+      { msg: "⚙️ COMPUTING SEMANTIC VECTOR EMBEDDING (LlamaIndex)", delay: 800 },
+      { msg: "🌐 QDRANT DB LOOKUP: Scanning high-dimensional product nodes", delay: 900 },
+      { msg: "🔍 RETRIEVED: Found 3 candidate nodes matching 'eco-friendly yoga mats'", delay: 700 },
+      { msg: "🛡️ TRIGGERING ADVERSARIAL STOCK VALIDATION (Medusa API)...", delay: 1000 },
+      { msg: "📊 LIVE AUDIT: Checking active warehouse stock levels", delay: 700 },
+      { msg: "✅ INVENTORY VERIFIED: Natural Cork Yoga Mat (In Stock: 14 units)", delay: 600 },
+      { msg: "🧠 LLM GROUNDING: Framing context payload with zero hallucination", delay: 800 },
+      { msg: "🚀 SYSTEM RESPONSE STAMPED & SIGNED", delay: 400 },
+    ];
+
+    for (const step of steps) {
+      setRagLogs((prev) => [...prev, step.msg]);
+      await sleep(step.delay);
+    }
+
+    setRagStatus("done");
+    if (query.includes("eco-friendly")) {
+      setRagAnswer("Based on the active Medusa catalog, I highly recommend our **Natural Organic Cork Yoga Mat**. It is built from 100% biodegradable natural cork backed with organic tree rubber. The warehouse currently has **14 units in stock** priced at **$79.00**. (Zero hallucination verified against database catalog.)");
+    } else if (query.includes("Chakra")) {
+      setRagAnswer("Yes, the **Chakra alignment non-slip mat** is fully in stock! Medusa API logs report **22 units active** in the database, retailing at **$65.00**. Standard shipping is verified available.");
+    } else {
+      setRagAnswer("Searching Yogateria catalog... I found our **Eco-Comfort Yoga Leggings** (Organic cotton blend, 8 units in stock, $49) and **Pro Grip Alignment Mat** (Natural rubber, 5 units in stock, $89). All stock entries have been checked in real time against Medusa databases.");
+    }
+  };
+
+  // Run Swarm simulation
+  const runSwarmSimulation = async () => {
+    setSwarmState("crawling");
+    setSwarmLogs([]);
+    setActiveSwarmNode("Supervisor");
+
+    const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    const steps = [
+      { node: "Supervisor", log: "🤖 Supervisor initializing Hermes Multi-Agent SEO Swarm...", delay: 800 },
+      { node: "Crawl Agent", log: "🕷️ Crawl Agent dispatched to scanning layout DOM trees...", delay: 900 },
+      { node: "Crawl Agent", log: "⚠️ Crawl Agent: Discovered missing semantic META descriptions!", delay: 600 },
+      { node: "SEM Auditor", log: "📊 SEM Auditor auditing layout headers (h1, canonical structures)", delay: 800 },
+      { node: "SEM Auditor", log: "🛡️ Semantic gap warning raised in layout.tsx #SEO-L22", delay: 600 },
+      { node: "Metadata Writer", log: "✍️ Metadata Writer crafting high-impact meta headers...", delay: 800 },
+      { node: "Supervisor", log: "🔄 Supervisor routing self-healing request to remediation tunnel...", delay: 700 },
+      { node: "GitHub Fixer", log: "🔧 GitHub Fixer calling python3 github_fixer.py to patch codebase...", delay: 900 },
+      { node: "GitHub Fixer", log: "⚡ Pull Request raised automatically on GitHub repository!", delay: 700 },
+      { node: "Verification Gate", log: "🔬 Verification Gate auditing build output (npx tsc --noEmit: SUCCESS)", delay: 900 },
+      { node: "Supervisor", log: "✨ Swarm operation completed successfully! Lighthouse score updated: 98% SEO.", delay: 500 }
+    ];
+
+    for (const step of steps) {
+      setActiveSwarmNode(step.node);
+      setSwarmLogs((prev) => [...prev, step.log]);
+      await sleep(step.delay);
+    }
+
+    setSwarmState("done");
+    setActiveSwarmNode(null);
+  };
+
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '3rem', marginTop: '2rem', alignItems: 'stretch' }}>
+      {/* Left side timeline select list */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
+        <h4 style={{ fontSize: '0.8rem', fontWeight: 800, color: '#71717a', textTransform: 'uppercase', letterSpacing: '1.5px', marginBottom: '0.5rem' }}>
+          Interactive Case Studies
+        </h4>
+        {initialArticles.map((art, idx) => {
+          const isActive = idx === activeIdx;
+          return (
+            <motion.div
+              key={art.title}
+              onClick={() => {
+                setActiveIdx(idx);
+                setActiveTab("sim");
+              }}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              style={{
+                background: isActive ? `${art.color}08` : 'rgba(255,255,255,0.01)',
+                border: isActive ? `1.5px solid ${art.color}80` : '1px solid rgba(255,255,255,0.04)',
+                boxShadow: isActive ? `0 15px 35px ${art.color}0e, inset 0 0 15px ${art.color}05` : 'none',
+                borderRadius: '20px',
+                padding: '1.5rem',
+                cursor: 'pointer',
+                transition: 'border-color 0.3s, background 0.3s',
+                display: 'flex',
+                gap: '1.2rem',
+                alignItems: 'center',
+                position: 'relative',
+                overflow: 'hidden'
+              }}
+            >
+              {/* Left active colored line indicator */}
+              <div style={{ position: 'absolute', left: 0, top: 0, bottom: 0, width: '4px', background: isActive ? art.color : 'transparent' }} />
+              
+              {/* Interactive Pulse Ring */}
+              <div style={{ position: 'relative', width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(255,255,255,0.02)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1px solid rgba(255,255,255,0.06)' }}>
+                {isActive && (
+                  <motion.div
+                    animate={{ scale: [1, 1.4, 1], opacity: [0.3, 0, 0.3] }}
+                    transition={{ repeat: Infinity, duration: 2 }}
+                    style={{ position: 'absolute', inset: -4, borderRadius: '50%', border: `1.5px solid ${art.color}` }}
+                  />
+                )}
+                <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: art.color, margin: 'auto' }} />
+              </div>
+
+              <div style={{ flex: 1 }}>
+                <div className="flex" style={{ gap: '0.6rem', alignItems: 'center', marginBottom: '0.3rem' }}>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 800, color: art.color, textTransform: 'uppercase' }}>{art.category}</span>
+                  <span style={{ fontSize: '0.75rem', color: '#71717a' }}>{art.readTime}</span>
+                </div>
+                <h4 style={{ fontSize: '1rem', fontWeight: 800, color: '#ffffff', margin: 0, lineHeight: 1.3 }}>{art.title}</h4>
+              </div>
+            </motion.div>
+          );
+        })}
+
+        <div style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.03)', padding: '1.8rem', borderRadius: '24px', marginTop: '1rem' }}>
+          <h4 style={{ fontWeight: 800, color: '#ffffff', fontSize: '0.9rem', marginBottom: '0.6rem' }}>🔬 About Tirth's Research Lab</h4>
+          <p style={{ color: '#71717a', fontSize: '0.85rem', lineHeight: 1.5, margin: 0 }}>
+            Select any pipeline index node above to run dynamic interactive simulations of advanced production systems. Under details, view exact architectural parameters.
+          </p>
+        </div>
+      </div>
+
+      {/* Right side simulation panel card */}
+      <div style={{ gridColumn: 'span 2', display: 'flex', flexDirection: 'column' }}>
+        <div style={{
+          background: 'rgba(9, 9, 14, 0.85)',
+          border: `1.5px solid ${activeArticle.color}30`,
+          boxShadow: `0 30px 60px rgba(0,0,0,0.85), 0 0 50px ${activeArticle.color}0e`,
+          borderRadius: '24px',
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden',
+          position: 'relative'
+        }}>
+          {/* Top telemetry bar */}
+          <div style={{ background: 'rgba(255,255,255,0.02)', padding: '1rem 1.8rem', borderBottom: '1px solid rgba(255,255,255,0.04)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+            <div className="flex flex-center" style={{ gap: '0.6rem' }}>
+              <span style={{ display: 'inline-block', width: '8px', height: '8px', borderRadius: '50%', background: activeArticle.color }} />
+              <span style={{ fontSize: '0.85rem', fontWeight: 800, color: '#ffffff', letterSpacing: '0.5px' }}>SYSTEM DEPLOYMENT AUDITOR</span>
+            </div>
+            
+            {/* Simulation / Architectural Details Tabs */}
+            <div style={{ display: 'flex', background: 'rgba(0,0,0,0.4)', padding: '0.2rem', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.06)' }}>
+              <button
+                onClick={() => setActiveTab("sim")}
+                style={{
+                  background: activeTab === "sim" ? activeArticle.color : 'transparent',
+                  color: activeTab === "sim" ? '#ffffff' : '#a1a1aa',
+                  border: 'none',
+                  padding: '0.4rem 1rem',
+                  borderRadius: '8px',
+                  fontSize: '0.8rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                LIVE SIMULATION
+              </button>
+              <button
+                onClick={() => setActiveTab("details")}
+                style={{
+                  background: activeTab === "details" ? activeArticle.color : 'transparent',
+                  color: activeTab === "details" ? '#ffffff' : '#a1a1aa',
+                  border: 'none',
+                  padding: '0.4rem 1rem',
+                  borderRadius: '8px',
+                  fontSize: '0.8rem',
+                  fontWeight: 700,
+                  cursor: 'pointer',
+                  transition: 'all 0.2s'
+                }}
+              >
+                ARCHITECTURAL CODE
+              </button>
+            </div>
+          </div>
+
+          <div style={{ padding: '2.5rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
+            
+            {activeTab === "sim" ? (
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                
+                {/* RAG Simulator */}
+                {activeIdx === 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', flex: 1 }}>
+                    <div style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '1rem' }}>
+                      <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.5rem' }}>Interactive RAG Inventory recommendations</h3>
+                      <p style={{ color: '#71717a', fontSize: '0.85rem', margin: 0 }}>
+                        Click a pre-compiled sample query to watch our vector index query the database, audit live warehouse stock via Medusa API, and generate grounded answers.
+                      </p>
+                    </div>
+
+                    {/* Pre-compiled query triggers */}
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.8rem' }}>
+                      <button
+                        onClick={() => runRagSimulation("Recommend organic and eco-friendly yoga mats")}
+                        disabled={ragStatus === "running"}
+                        style={{
+                          background: 'rgba(255,255,255,0.03)',
+                          border: '1px solid rgba(255,255,255,0.06)',
+                          color: '#e4e4e7',
+                          padding: '0.6rem 1rem',
+                          borderRadius: '10px',
+                          fontSize: '0.85rem',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          transition: 'all 0.2s'
+                        }}
+                        onMouseEnter={(e) => { if (ragStatus !== "running") e.currentTarget.style.borderColor = activeArticle.color; }}
+                        onMouseLeave={(e) => { if (ragStatus !== "running") e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'; }}
+                      >
+                        "Recommend eco-friendly mats"
+                      </button>
+                      <button
+                        onClick={() => runRagSimulation("Do we have the Chakra alignment mat in stock?")}
+                        disabled={ragStatus === "running"}
+                        style={{
+                          background: 'rgba(255,255,255,0.03)',
+                          border: '1px solid rgba(255,255,255,0.06)',
+                          color: '#e4e4e7',
+                          padding: '0.6rem 1rem',
+                          borderRadius: '10px',
+                          fontSize: '0.85rem',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          transition: 'all 0.2s'
+                        }}
+                        onMouseEnter={(e) => { if (ragStatus !== "running") e.currentTarget.style.borderColor = activeArticle.color; }}
+                        onMouseLeave={(e) => { if (ragStatus !== "running") e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'; }}
+                      >
+                        "Is Chakra mat in stock?"
+                      </button>
+                      <button
+                        onClick={() => runRagSimulation("What are the best catalog items under $50?")}
+                        disabled={ragStatus === "running"}
+                        style={{
+                          background: 'rgba(255,255,255,0.03)',
+                          border: '1px solid rgba(255,255,255,0.06)',
+                          color: '#e4e4e7',
+                          padding: '0.6rem 1rem',
+                          borderRadius: '10px',
+                          fontSize: '0.85rem',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          transition: 'all 0.2s'
+                        }}
+                        onMouseEnter={(e) => { if (ragStatus !== "running") e.currentTarget.style.borderColor = activeArticle.color; }}
+                        onMouseLeave={(e) => { if (ragStatus !== "running") e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)'; }}
+                      >
+                        "Find catalog items under $50"
+                      </button>
+                    </div>
+
+                    {/* Split View: Telemetry logs & generated output */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', flex: 1 }}>
+                      {/* Telemetry log shell */}
+                      <div style={{ background: '#020204', border: '1px solid rgba(255,255,255,0.04)', borderRadius: '12px', padding: '1.2rem', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', display: 'flex', flexDirection: 'column', height: '220px', overflowY: 'auto' }}>
+                        <div style={{ color: '#71717a', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '0.4rem', marginBottom: '0.6rem', fontWeight: 800 }}>
+                          SYSTEM AGENT TELEMETRY LOGS
+                        </div>
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                          {ragLogs.length === 0 && (
+                            <div style={{ color: '#4b5563', fontStyle: 'italic' }}>System idle. Trigger a recommendation query...</div>
+                          )}
+                          {ragLogs.map((log, lIdx) => (
+                            <div key={lIdx} style={{ color: log.startsWith('✅') ? '#10b981' : log.startsWith('⚡') ? activeArticle.color : '#a1a1aa', lineHeight: 1.4 }}>
+                              {log}
+                            </div>
+                          ))}
+                          <div ref={ragLogEndRef} />
+                        </div>
+                      </div>
+
+                      {/* grounded response bubble */}
+                      <div style={{ background: 'rgba(255,255,255,0.01)', border: `1px solid ${activeArticle.color}15`, borderRadius: '12px', padding: '1.2rem', display: 'flex', flexDirection: 'column', height: '220px' }}>
+                        <div style={{ color: '#71717a', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '0.4rem', marginBottom: '0.8rem', fontSize: '0.8rem', fontWeight: 800, letterSpacing: '0.5px' }}>
+                          VERIFIED GROUNDED CATALOG RESPONSE
+                        </div>
+                        <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', overflowY: 'auto' }}>
+                          {ragStatus === "idle" && (
+                            <div style={{ color: '#71717a', fontSize: '0.9rem', fontStyle: 'italic', textAlign: 'center' }}>
+                              Waiting for query semantic processing...
+                            </div>
+                          )}
+                          {ragStatus === "running" && (
+                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.8rem' }}>
+                              <motion.div
+                                animate={{ rotate: 360 }}
+                                transition={{ repeat: Infinity, duration: 1, ease: 'linear' }}
+                                style={{ width: '24px', height: '24px', borderRadius: '50%', border: `2px solid ${activeArticle.color}`, borderTopColor: 'transparent' }}
+                              />
+                              <span style={{ color: '#a1a1aa', fontSize: '0.85rem' }}>Synthesizing knowledge...</span>
+                            </div>
+                          )}
+                          {ragStatus === "done" && (
+                            <motion.p
+                              initial={{ opacity: 0, y: 5 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              style={{ color: '#e4e4e7', fontSize: '0.87rem', lineHeight: 1.6, margin: 0, textAlign: 'left', alignSelf: 'start' }}
+                            >
+                              {ragAnswer}
+                            </motion.p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* ARIMA vs LSTM Simulator */}
+                {activeIdx === 1 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', flex: 1 }}>
+                    <div style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'start', flexWrap: 'wrap', gap: '1rem' }}>
+                      <div>
+                        <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.5rem' }}>Interactive Stock Trend Predictor</h3>
+                        <p style={{ color: '#71717a', fontSize: '0.85rem', margin: 0 }}>
+                          Toggle between Classical ARIMA statistics and Recurrent neural LSTM networks to watch forecasting accuracy converge.
+                        </p>
+                      </div>
+
+                      {/* Model toggle switcher */}
+                      <div style={{ display: 'flex', background: 'rgba(0,0,0,0.4)', padding: '0.2rem', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                        <button
+                          onClick={() => setTimeModel("arima")}
+                          style={{
+                            background: timeModel === "arima" ? activeArticle.color : 'transparent',
+                            color: timeModel === "arima" ? '#ffffff' : '#a1a1aa',
+                            border: 'none',
+                            padding: '0.4rem 1rem',
+                            borderRadius: '8px',
+                            fontSize: '0.8rem',
+                            fontWeight: 700,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          ARIMA Model
+                        </button>
+                        <button
+                          onClick={() => setTimeModel("lstm")}
+                          style={{
+                            background: timeModel === "lstm" ? activeArticle.color : 'transparent',
+                            color: timeModel === "lstm" ? '#ffffff' : '#a1a1aa',
+                            border: 'none',
+                            padding: '0.4rem 1rem',
+                            borderRadius: '8px',
+                            fontSize: '0.8rem',
+                            fontWeight: 700,
+                            cursor: 'pointer'
+                          }}
+                        >
+                          LSTM Neural Net
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* forecasting visualizer SVG Canvas */}
+                    <div style={{ background: '#020204', border: '1px solid rgba(255,255,255,0.04)', borderRadius: '12px', padding: '1.5rem', flex: 1, display: 'flex', flexDirection: 'column', minHeight: '200px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.8rem', fontSize: '0.75rem', color: '#71717a' }}>
+                        <span>MODEL HORIZON FORECAST (30 DAYS)</span>
+                        <span style={{ color: activeArticle.color, fontWeight: 800 }}>
+                          {timeModel === "arima" ? "ARIMA (1, 1, 1) Linear Trend" : "LSTM Deep Recurrent Sequence Fit"}
+                        </span>
+                      </div>
+
+                      {/* Animated SVG Chart */}
+                      <div style={{ flex: 1, position: 'relative', width: '100%', minHeight: '140px', overflow: 'hidden' }}>
+                        <svg width="100%" height="100%" viewBox="0 0 500 120" preserveAspectRatio="none" style={{ overflow: 'visible' }}>
+                          {/* Grid Lines */}
+                          <line x1="0" y1="90" x2="500" y2="90" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
+                          <line x1="0" y1="60" x2="500" y2="60" stroke="rgba(255,255,255,0.03)" strokeWidth="1" strokeDasharray="4 4" />
+                          <line x1="0" y1="30" x2="500" y2="30" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
+
+                          {/* Historical Stock Price Line */}
+                          <path
+                            d="M 0 100 Q 40 85, 80 95 T 160 80 T 240 85 T 320 60 L 320 60"
+                            fill="none"
+                            stroke="#71717a"
+                            strokeWidth="2"
+                          />
+                          <text x="5" y="115" fill="#71717a" fontSize="8" fontFamily="var(--font-mono)">Historical Sequence</text>
+                          <line x1="320" y1="0" x2="320" y2="120" stroke="rgba(255,255,255,0.08)" strokeWidth="1.5" strokeDasharray="3 3" />
+                          <text x="325" y="15" fill="#a1a1aa" fontSize="7" fontFamily="var(--font-mono)">Forecast Boundary</text>
+
+                          {/* Conditional Forecast Path */}
+                          {timeModel === "arima" ? (
+                            // ARIMA: Rigid straight forecasting
+                            <motion.path
+                              key="arima-path"
+                              initial={{ pathLength: 0 }}
+                              animate={{ pathLength: 1 }}
+                              transition={{ duration: 0.8 }}
+                              d="M 320 60 L 360 52 L 400 46 L 440 40 L 500 32"
+                              fill="none"
+                              stroke={activeArticle.color}
+                              strokeWidth="3"
+                              strokeLinecap="round"
+                            />
+                          ) : (
+                            // LSTM: Recurrent wave fit
+                            <motion.path
+                              key="lstm-path"
+                              initial={{ pathLength: 0 }}
+                              animate={{ pathLength: 1 }}
+                              transition={{ duration: 1.2, ease: 'easeOut' }}
+                              d="M 320 60 C 350 45, 380 75, 410 35 C 440 -5, 470 65, 500 20"
+                              fill="none"
+                              stroke={activeArticle.color}
+                              strokeWidth="3"
+                              strokeLinecap="round"
+                            />
+                          )}
+                        </svg>
+                      </div>
+                    </div>
+
+                    {/* Stats comparison bar */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '1rem' }}>
+                      <div style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '12px' }}>
+                        <div style={{ color: '#71717a', fontSize: '0.75rem', marginBottom: '0.2rem' }}>VALIDATION LOSS (MSE)</div>
+                        <div style={{ color: timeModel === 'lstm' ? '#10b981' : '#ffffff', fontWeight: 800, fontSize: '1.1rem' }}>
+                          {timeModel === 'lstm' ? "0.002 (Minimal)" : "0.014 (Standard)"}
+                        </div>
+                      </div>
+                      <div style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '12px' }}>
+                        <div style={{ color: '#71717a', fontSize: '0.75rem', marginBottom: '0.2rem' }}>FORECAST INTENT</div>
+                        <div style={{ color: '#ffffff', fontWeight: 800, fontSize: '1.1rem' }}>
+                          {timeModel === 'lstm' ? "Non-Linear Trend" : "Short-Horizon Trend"}
+                        </div>
+                      </div>
+                      <div style={{ background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.03)', padding: '1rem', borderRadius: '12px' }}>
+                        <div style={{ color: '#71717a', fontSize: '0.75rem', marginBottom: '0.2rem' }}>COMPUTATIONAL RUNTIME</div>
+                        <div style={{ color: '#ffffff', fontWeight: 800, fontSize: '1.1rem' }}>
+                          {timeModel === 'lstm' ? "180ms Train/Epoch" : "12ms LinearFit"}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Swarm Loop Simulator */}
+                {activeIdx === 2 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', flex: 1 }}>
+                    <div style={{ borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+                      <div>
+                        <h3 style={{ fontSize: '1.25rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.5rem' }}>17-Agent Swarm Orchestration Gateway</h3>
+                        <p style={{ color: '#71717a', fontSize: '0.85rem', margin: 0 }}>
+                          Dispatch the Supervisor to trigger semantic SEO audits, metadata repairs, and self-healing GitHub fixers.
+                        </p>
+                      </div>
+
+                      <button
+                        onClick={runSwarmSimulation}
+                        disabled={swarmState === "crawling"}
+                        style={{
+                          background: activeArticle.color,
+                          color: '#ffffff',
+                          border: 'none',
+                          padding: '0.6rem 1.4rem',
+                          borderRadius: '10px',
+                          fontWeight: 700,
+                          fontSize: '0.85rem',
+                          cursor: swarmState === "crawling" ? 'not-allowed' : 'pointer',
+                          boxShadow: `0 8px 25px ${activeArticle.color}35`,
+                          transition: 'opacity 0.2s',
+                          opacity: swarmState === "crawling" ? 0.7 : 1
+                        }}
+                      >
+                        {swarmState === "crawling" ? "Swarm Executing..." : "Run Self-Healing Swarm"}
+                      </button>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', flex: 1 }}>
+                      {/* Interactive Agent Swarm stack visualizer */}
+                      <div style={{ background: '#020204', border: '1px solid rgba(255,255,255,0.04)', borderRadius: '12px', padding: '1.2rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', height: '240px' }}>
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.45rem', justifyContent: 'center' }}>
+                          {[
+                            { name: "Supervisor", label: "🤖 Supervisor Coordinator" },
+                            { name: "Crawl Agent", label: "🕷️ Crawl Agent Node" },
+                            { name: "SEM Auditor", label: "📊 SEM Auditor Agent" },
+                            { name: "Metadata Writer", label: "✍️ Metadata Writer Agent" },
+                            { name: "GitHub Fixer", label: "🔧 GitHub Fixer Gate" },
+                            { name: "Verification Gate", label: "🔬 Verification Gate" },
+                          ].map((node) => {
+                            const isNodeActive = activeSwarmNode === node.name;
+                            return (
+                              <div
+                                key={node.name}
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  gap: '1rem',
+                                  padding: '0.4rem 0.8rem',
+                                  borderRadius: '8px',
+                                  border: isNodeActive ? `1.5px solid ${activeArticle.color}` : '1px solid rgba(255,255,255,0.03)',
+                                  background: isNodeActive ? `${activeArticle.color}0d` : 'rgba(255,255,255,0.01)',
+                                  boxShadow: isNodeActive ? `0 0 15px ${activeArticle.color}15` : 'none',
+                                  transition: 'all 0.3s'
+                                }}
+                              >
+                                <div style={{
+                                  width: '8px',
+                                  height: '8px',
+                                  borderRadius: '50%',
+                                  background: isNodeActive ? activeArticle.color : 'rgba(255,255,255,0.1)',
+                                  boxShadow: isNodeActive ? `0 0 10px ${activeArticle.color}` : 'none'
+                                }} />
+                                <span style={{
+                                  fontSize: '0.78rem',
+                                  fontWeight: 700,
+                                  color: isNodeActive ? '#ffffff' : '#71717a'
+                                }}>
+                                  {node.label}
+                                </span>
+                                {isNodeActive && (
+                                  <span style={{ fontSize: '0.65rem', color: activeArticle.color, marginLeft: 'auto', fontWeight: 800 }}>
+                                    ACTIVE
+                                  </span>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Swarm Event Terminal logs */}
+                      <div style={{ background: '#020204', border: '1px solid rgba(255,255,255,0.04)', borderRadius: '12px', padding: '1.2rem', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', display: 'flex', flexDirection: 'column', height: '240px', overflowY: 'auto' }}>
+                        <div style={{ color: '#71717a', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '0.4rem', marginBottom: '0.6rem', fontWeight: 800 }}>
+                          DISPATCHED SWARM OPERATION DECK
+                        </div>
+                        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                          {swarmLogs.length === 0 && (
+                            <div style={{ color: '#4b5563', fontStyle: 'italic' }}>Supervisor offline. Dispatch swarm above...</div>
+                          )}
+                          {swarmLogs.map((log, lIdx) => (
+                            <div key={lIdx} style={{ color: log.includes('⚠️') ? '#f59e0b' : log.includes('✨') ? '#10b981' : '#a1a1aa', lineHeight: 1.4 }}>
+                              {log}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+              </div>
+            ) : (
+              // Architectural Tab
+              <div style={{ flex: 1, color: '#e4e4e7', fontSize: '0.95rem', lineHeight: 1.7, display: 'flex', flexDirection: 'column', gap: '1.5rem', maxHeight: '350px', overflowY: 'auto', paddingRight: '0.5rem' }}>
+                <div style={{ borderBottom: `2px solid ${activeArticle.color}25`, paddingBottom: '1rem' }}>
+                  <span style={{ fontSize: '0.75rem', fontWeight: 800, color: activeArticle.color, background: `${activeArticle.color}10`, padding: '0.3rem 0.6rem', borderRadius: '6px', border: `1px solid ${activeArticle.color}20` }}>
+                    {activeArticle.complexity}
+                  </span>
+                  <h3 style={{ fontSize: '1.35rem', fontWeight: 900, color: '#ffffff', marginTop: '0.6rem', marginBottom: '0.3rem' }}>{activeArticle.title}</h3>
+                  <p style={{ color: '#a1a1aa', fontSize: '0.85rem', margin: 0 }}>Indexed and ground via {activeArticle.framework}</p>
+                </div>
+
+                <div style={{ background: 'rgba(255,255,255,0.01)', borderLeft: `3px solid ${activeArticle.color}`, padding: '1rem 1.4rem', borderRadius: '8px' }}>
+                  <h4 style={{ margin: '0 0 0.3rem 0', fontWeight: 800, color: '#ffffff', fontSize: '0.9rem' }}>💡 Architectural Takeaway</h4>
+                  <p style={{ margin: 0, fontSize: '0.85rem', color: '#b4b4bb', lineHeight: 1.5 }}>{activeArticle.takeaway}</p>
+                </div>
+
+                {activeArticle.sections && activeArticle.sections.map((sec: any, sIdx: number) => (
+                  <div key={sIdx}>
+                    <h4 style={{ fontSize: '1.05rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.4rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      <span style={{ display: 'inline-block', width: '3px', height: '12px', borderRadius: '1.5px', background: activeArticle.color }} />
+                      {sec.heading}
+                    </h4>
+                    <p style={{ color: '#a1a1aa', fontSize: '0.85rem', margin: 0, lineHeight: 1.6 }}>{sec.text}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Bottom full case study launcher */}
+            <div style={{ borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: '1.5rem', marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                {activeArticle.techStack && activeArticle.techStack.map((tech: string) => (
+                  <span key={tech} style={{ fontSize: '0.7rem', color: '#a1a1aa', background: 'rgba(255,255,255,0.02)', padding: '0.2rem 0.5rem', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.04)' }}>
+                    {tech}
+                  </span>
+                ))}
+              </div>
+
+              <button
+                onClick={() => openFullModal(activeArticle)}
+                className="flex flex-center"
+                style={{
+                  background: 'transparent',
+                  border: `1px solid ${activeArticle.color}50`,
+                  color: '#ffffff',
+                  padding: '0.6rem 1.4rem',
+                  borderRadius: '12px',
+                  fontWeight: 700,
+                  fontSize: '0.85rem',
+                  cursor: 'pointer',
+                  transition: 'all 0.25s',
+                  boxShadow: `inset 0 0 15px ${activeArticle.color}0a`,
+                  gap: '0.4rem'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = activeArticle.color;
+                  e.currentTarget.style.borderColor = activeArticle.color;
+                  e.currentTarget.style.boxShadow = `0 8px 20px ${activeArticle.color}30`;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.borderColor = `${activeArticle.color}50`;
+                  e.currentTarget.style.boxShadow = `inset 0 0 15px ${activeArticle.color}0a`;
+                }}
+              >
+                Launch Extended Case Study <ArrowRight size={14} />
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [isScrolled, setIsScrolled] = useState(false);
@@ -780,6 +1445,7 @@ export default function Home() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   const [articles, setArticles] = useState<any[]>(initialArticles);
+  const [activeLabIdx, setActiveLabIdx] = useState(0);
 
   useEffect(() => {
     const fetchArticles = async () => {
@@ -2340,81 +3006,11 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '2.5rem' }}>
-            {articles.map((art, idx) => (
-              <SpotlightCard
-                key={art.title}
-                initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                whileInView={{ opacity: 1, y: 0, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.55, type: "spring", stiffness: 90, damping: 14, delay: idx * 0.1 }}
-                className="glass-card"
-                whileHover="hover"
-                style={{ padding: '2.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', borderTop: `3px solid ${art.color}`, cursor: 'pointer' }}
-                onClick={() => {
-                  if (art.isExternal) {
-                    window.open(art.url, '_blank');
-                  } else {
-                    setSelectedArticle(art);
-                  }
-                }}
-              >
-                <div>
-                  {art.image && (
-                    <div style={{ position: 'relative', width: '100%', height: '180px', borderRadius: '12px', overflow: 'hidden', marginBottom: '1.5rem', border: '1px solid rgba(255,255,255,0.06)' }}>
-                      <motion.div
-                        variants={{
-                          hover: { scale: 1.06 }
-                        }}
-                        transition={{ duration: 0.4, ease: "easeOut" }}
-                        style={{ width: '100%', height: '100%', position: 'relative' }}
-                      >
-                        {art.isExternal ? (
-                          <img
-                            src={art.image}
-                            alt={art.imageAlt}
-                            title={art.imageAlt}
-                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                          />
-                        ) : (
-                          <Image
-                            src={art.image}
-                            alt={art.imageAlt}
-                            title={art.imageAlt}
-                            fill
-                            style={{ objectFit: 'cover' }}
-                          />
-                        )}
-                      </motion.div>
-                    </div>
-                  )}
-                  <div className="flex" style={{ justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem' }}>
-                    <span style={{ fontSize: '0.8rem', fontWeight: 700, color: art.color, background: `${art.color}12`, padding: '0.35rem 0.8rem', borderRadius: '8px', border: `1px solid ${art.color}25` }}>
-                      {art.category}
-                    </span>
-                    <span style={{ fontSize: '0.8rem', color: '#71717a' }}>{art.readTime}</span>
-                  </div>
-                  <h3 style={{ fontSize: '1.35rem', fontWeight: 800, marginBottom: '1rem', lineHeight: 1.4, color: '#ffffff' }}>{art.title}</h3>
-                  <p style={{ color: '#a1a1aa', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '2rem' }}>{art.desc}</p>
-                </div>
-                <div 
-                  className="flex" 
-                  style={{ alignItems: 'center', gap: '0.4rem', color: art.color, fontWeight: 700, fontSize: '0.95rem', marginTop: '0.5rem' }}
-                >
-                  Read Case Study
-                  <motion.span
-                    variants={{
-                      hover: { x: 6 }
-                    }}
-                    transition={{ duration: 0.25, ease: "easeInOut" }}
-                    style={{ display: 'inline-flex', alignItems: 'center' }}
-                  >
-                    <ArrowRight size={16} />
-                  </motion.span>
-                </div>
-              </SpotlightCard>
-            ))}
-          </div>
+          <InteractiveLab
+            activeIdx={activeLabIdx}
+            setActiveIdx={setActiveLabIdx}
+            openFullModal={(art) => setSelectedArticle(art)}
+          />
         </div>
       </section>
 
@@ -3106,6 +3702,64 @@ export default function Home() {
                       animate={{ opacity: 1 }}
                       exit={{ opacity: 0 }}
                     >
+                      {/* Interactive Quick Templates */}
+                      <div style={{ marginBottom: '2rem' }}>
+                        <label style={{ fontSize: '0.8rem', fontWeight: 800, color: '#71717a', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: '0.8rem' }}>
+                          ⚡ Click a Quick-Template Preset:
+                        </label>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.6rem' }}>
+                          {[
+                            {
+                              id: 'job',
+                              label: '💼 Job Offer',
+                              msg: "Hi Tirth,\n\nI reviewed your portfolio and was highly impressed by your Interactive AI Swarms and Zero-Hallucination RAG simulations. We are actively hiring for an AI Engineer / Software Engineer role and would love to chat with you about joining our team.\n\nBest regards,"
+                            },
+                            {
+                              id: 'collab',
+                              label: '⚡ Collaboration',
+                              msg: "Hi Tirth,\n\nI am working on an agentic workflow project and would love to collaborate with you to integrate some of the autonomous state gateway architectures and Python fixers you developed. Let's schedule a brief call to align on ideas.\n\nCheers,"
+                            },
+                            {
+                              id: 'coffee',
+                              label: '☕ Coffee Chat',
+                              msg: "Hi Tirth,\n\nI love your tech stack and research projects. I'd love to connect for a 15-minute virtual coffee chat to trade insights on LlamaIndex, Qdrant, and Agentic SEO swarms.\n\nWarmly,"
+                            }
+                          ].map((tmpl) => (
+                            <button
+                              key={tmpl.id}
+                              type="button"
+                              onClick={() => {
+                                setFormData({
+                                  ...formData,
+                                  message: tmpl.msg
+                                });
+                              }}
+                              style={{
+                                background: 'rgba(255,255,255,0.02)',
+                                border: '1px solid rgba(255,255,255,0.06)',
+                                color: '#e4e4e7',
+                                padding: '0.5rem 0.9rem',
+                                borderRadius: '10px',
+                                fontSize: '0.8rem',
+                                fontWeight: 700,
+                                cursor: 'pointer',
+                                transition: 'all 0.2s',
+                              }}
+                              onMouseEnter={(e) => {
+                                e.currentTarget.style.borderColor = 'var(--primary)';
+                                e.currentTarget.style.background = 'rgba(99, 102, 241, 0.05)';
+                              }}
+                              onMouseLeave={(e) => {
+                                e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)';
+                                e.currentTarget.style.background = 'rgba(255,255,255,0.02)';
+                              }}
+                            >
+                              {tmpl.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
                       <div className="contact-input-group">
                         <input 
                           type="text" 
@@ -3144,14 +3798,52 @@ export default function Home() {
                         <label htmlFor="form-message" className="contact-label">Your Message</label>
                       </div>
 
-                      <button 
-                        type="submit" 
-                        className="btn btn-primary" 
-                        disabled={formStatus === 'sending'}
-                        style={{ width: '100%', justifyContent: 'center' }}
-                      >
-                        {formStatus === 'sending' ? 'Sending Data...' : 'Dispatch Message'} <Send size={16} />
-                      </button>
+                      <div className="flex" style={{ gap: '1rem', marginTop: '1rem' }}>
+                        <button 
+                          type="submit" 
+                          className="btn btn-primary" 
+                          disabled={formStatus === 'sending'}
+                          style={{ flex: 1, justifyContent: 'center' }}
+                        >
+                          {formStatus === 'sending' ? 'Sending Data...' : 'Dispatch Message'} <Send size={16} />
+                        </button>
+                        
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const subject = encodeURIComponent(
+                              formData.name ? `Inquiry from ${formData.name} (Tirth Patel Portfolio)` : "Collaboration Inquiry | Tirth Patel Portfolio"
+                            );
+                            const body = encodeURIComponent(
+                              `${formData.message || 'Hi Tirth,\n\nI would love to connect with you...'}\n\n---\nSender: ${formData.name || 'Visitor'}\nEmail: ${formData.email || 'Not specified'}`
+                            );
+                            window.open(`https://mail.google.com/mail/?view=cm&fs=1&to=tirth.p.patel143@gmail.com&su=${subject}&body=${body}`, '_blank');
+                          }}
+                          className="btn btn-outline"
+                          style={{ 
+                            padding: '0.7rem 1.2rem',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                            borderColor: '#ea433580',
+                            color: '#ffffff',
+                            background: 'rgba(234, 67, 53, 0.05)'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.borderColor = '#ea4335';
+                            e.currentTarget.style.background = 'rgba(234, 67, 53, 0.15)';
+                            e.currentTarget.style.boxShadow = '0 0 15px rgba(234, 67, 53, 0.2)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.borderColor = '#ea433580';
+                            e.currentTarget.style.background = 'rgba(234, 67, 53, 0.05)';
+                            e.currentTarget.style.boxShadow = 'none';
+                          }}
+                          title="Open Gmail Composer with pre-filled message"
+                        >
+                          Direct Gmail 🚀
+                        </button>
+                      </div>
                     </motion.form>
                   )}
                 </AnimatePresence>
