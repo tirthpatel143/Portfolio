@@ -2425,17 +2425,7 @@ export default function Home() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            style={{
-              position: 'fixed',
-              inset: 0,
-              background: 'rgba(3, 3, 5, 0.85)',
-              backdropFilter: 'blur(16px)',
-              zIndex: 9999,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '2rem'
-            }}
+            className="modal-overlay"
             onClick={() => setSelectedArticle(null)}
           >
             <motion.div
@@ -2443,16 +2433,10 @@ export default function Home() {
               animate={{ scale: 1, y: 0, opacity: 1 }}
               exit={{ scale: 0.9, y: 20, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="modal-content-card"
               style={{
-                width: '100%',
-                maxWidth: '920px',
-                background: 'rgba(9, 9, 14, 0.98)',
                 border: `1px solid ${selectedArticle.color}35`,
                 boxShadow: `0 35px 80px rgba(0,0,0,0.85), 0 0 50px ${selectedArticle.color}12`,
-                borderRadius: '24px',
-                position: 'relative',
-                maxHeight: '90vh',
-                overflowY: 'auto'
               }}
               onClick={(e) => e.stopPropagation()}
             >
@@ -2492,7 +2476,7 @@ export default function Home() {
                 ✕
               </button>
 
-              <div style={{ padding: '3.5rem 3.5rem 2.5rem 3.5rem' }}>
+              <div className="modal-inner-padding">
                 {/* Meta details */}
                 <div className="flex" style={{ gap: '1rem', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
                   <span style={{ fontSize: '0.85rem', fontWeight: 800, color: selectedArticle.color, background: `${selectedArticle.color}12`, padding: '0.4rem 0.9rem', borderRadius: '8px', border: `1px solid ${selectedArticle.color}25`, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
@@ -2522,10 +2506,10 @@ export default function Home() {
                 )}
 
                 {/* Main Dynamic Grid Content */}
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '3.5rem', alignItems: 'start' }}>
+                <div className="modal-grid-layout">
                   
                   {/* Left Column (Rich technical text) */}
-                  <div style={{ gridColumn: 'span 2', color: '#e4e4e7', fontSize: '1.05rem', lineHeight: 1.8, fontFamily: 'var(--font-sans)', textAlign: 'justify' }}>
+                  <div className="modal-left-column" style={{ color: '#e4e4e7', fontSize: '1.05rem', lineHeight: 1.8, fontFamily: 'var(--font-sans)', textAlign: 'justify' }}>
                     
                     {/* Key takeaway highlight box */}
                     {selectedArticle.takeaway && (
