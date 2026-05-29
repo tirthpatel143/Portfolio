@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 // Configuration
-const HOST = 'portfolio-delta-lime-36.vercel.app';
+const HOST = 'tirthpatelportfolio08.vercel.app';
 const KEY = 'f6904ef245e34771ac5f2526e838e4a9';
 const KEY_LOCATION = `https://${HOST}/${KEY}.txt`;
 const SITEMAP_PATH = path.join(__dirname, '../public/sitemap.xml');

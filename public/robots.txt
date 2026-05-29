@@ -3,4 +3,4 @@ User-agent: *
 Allow: /
 
 # Sitemap Direction
-Sitemap: https://portfolio-delta-lime-36.vercel.app/sitemap.xml
+Sitemap: https://tirthpatelportfolio08.vercel.app/sitemap.xml
