@@ -813,3 +813,50 @@ h4,
   background: rgba(255, 255, 255, 0.03);
   transform: translateY(-2px);
 }
+
+/* Mobile-only toggle buttons and nav layout adjustments */
+.mobile-menu-btn {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .nav-links {
+    display: none !important;
+  }
+  
+  .mobile-menu-btn {
+    display: flex !important;
+  }
+  
+  .container {
+    padding: 0 1.2rem;
+  }
+}
+
+/* Mobile friendly Tech Stack Dock */
+.tech-dock-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 1.2rem;
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-radius: 24px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+  max-width: 100%;
+  position: relative;
+  overflow: visible;
+}
+
+@media (max-width: 768px) {
+  .tech-dock-container {
+    overflow-x: auto;
+    justify-content: flex-start;
+    padding: 1.2rem 0.5rem;
+    scrollbar-width: none; /* Hide scrollbar for clean aesthetic */
+  }
+  .tech-dock-container::-webkit-scrollbar {
+    display: none;
+  }
+}
