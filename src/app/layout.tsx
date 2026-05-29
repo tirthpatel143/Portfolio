@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Tirth Patel | Software Engineer & AI Orchestrator",
-  description: "Portfolio of Tirth Patel, specializing in autonomous AI swarms, distributed systems, and premium web experiences.",
+  description: "Tirth Patel, a professional Software Engineer & AI Orchestrator specializing in autonomous AI swarms, distributed systems, and premium web apps.",
   keywords: [
     "Tirth Patel",
     "Software Engineer",
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Tirth Patel | Software Engineer & AI Orchestrator",
-    description: "Portfolio of Tirth Patel, specializing in autonomous AI swarms, distributed systems, and premium web experiences.",
+    description: "Tirth Patel, a professional Software Engineer & AI Orchestrator specializing in autonomous AI swarms, distributed systems, and premium web apps.",
     url: "https://portfolio-delta-lime-36.vercel.app/",
     siteName: "Tirth Patel Portfolio",
     images: [
@@ -52,7 +52,7 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Tirth Patel | Software Engineer & AI Orchestrator",
-    description: "Portfolio of Tirth Patel, specializing in autonomous AI swarms, distributed systems, and premium web experiences.",
+    description: "Tirth Patel, a professional Software Engineer & AI Orchestrator specializing in autonomous AI swarms, distributed systems, and premium web apps.",
     images: ["https://portfolio-delta-lime-36.vercel.app/og-image.png"],
   },
   icons: {
@@ -76,7 +76,7 @@ export default function RootLayout({
         "jobTitle": "Software Engineer & AI Orchestrator",
         "url": "https://portfolio-delta-lime-36.vercel.app/",
         "image": "https://portfolio-delta-lime-36.vercel.app/og-image.jpg",
-        "description": "Portfolio of Tirth Patel, specializing in autonomous AI swarms, distributed systems, and premium web experiences.",
+        "description": "Tirth Patel, a professional Software Engineer & AI Orchestrator specializing in autonomous AI swarms, distributed systems, and premium web apps.",
         "telephone": "+916353782035",
         "email": "tirth.p.patel143@gmail.com",
         "address": {
@@ -134,7 +134,7 @@ export default function RootLayout({
         "@id": "https://portfolio-delta-lime-36.vercel.app/#website",
         "url": "https://portfolio-delta-lime-36.vercel.app/",
         "name": "Tirth Patel | Portfolio",
-        "description": "Portfolio of Tirth Patel, specializing in autonomous AI swarms, distributed systems, and premium web experiences.",
+        "description": "Tirth Patel, a professional Software Engineer & AI Orchestrator specializing in autonomous AI swarms, distributed systems, and premium web apps.",
         "publisher": {
           "@id": "https://portfolio-delta-lime-36.vercel.app/#person"
         }
@@ -150,7 +150,7 @@ export default function RootLayout({
         "about": {
           "@id": "https://portfolio-delta-lime-36.vercel.app/#person"
         },
-        "description": "Portfolio of Tirth Patel, specializing in autonomous AI swarms, distributed systems, and premium web experiences."
+        "description": "Tirth Patel, a professional Software Engineer & AI Orchestrator specializing in autonomous AI swarms, distributed systems, and premium web apps."
       },
       {
         "@type": "ProfilePage",
