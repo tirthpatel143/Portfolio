@@ -4,7 +4,7 @@ import {
   ArrowRight, Code2, Briefcase, Mail, ExternalLink, 
   Terminal, Cpu, Globe, Rocket, MessageSquare, 
   Layers, Database, Sparkles, Star, ChevronLeft, ChevronRight,
-  CheckCircle2, MapPin, Award, Send, Phone, Menu, X
+  CheckCircle2, MapPin, Award, Send, Phone, Menu, X, Clock
 } from "lucide-react";
 import Image from "next/image";
 import { motion, AnimatePresence, useMotionValue, useSpring, useMotionTemplate } from "framer-motion";
@@ -330,7 +330,7 @@ const agentNodes: AgentNode[] = [
   }
 ];
 
-const SpotlightCard = ({ children, className = "", style = {}, whileHover = {}, whileTap = {}, initial = {}, whileInView = {}, viewport = {}, transition = {} }: any) => {
+const SpotlightCard = ({ children, className = "", style = {}, whileHover = {}, whileTap = {}, initial = {}, whileInView = {}, viewport = {}, transition = {}, onClick }: any) => {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
@@ -339,6 +339,21 @@ const SpotlightCard = ({ children, className = "", style = {}, whileHover = {}, 
     mouseX.set(clientX - left);
     mouseY.set(clientY - top);
   }
+
+  const isStringHover = typeof whileHover === "string";
+  const safeWhileHover = typeof whileHover === "object" ? whileHover : {};
+  
+  const hoverStyles = {
+    scale: 1.03,
+    y: -6,
+    boxShadow: "0 20px 40px rgba(99, 102, 241, 0.15)",
+    borderColor: "rgba(99, 102, 241, 0.25)",
+    ...safeWhileHover
+  };
+
+  const dynamicVariants = isStringHover ? {
+    [whileHover]: hoverStyles
+  } : undefined;
 
   return (
     <motion.div
@@ -351,15 +366,11 @@ const SpotlightCard = ({ children, className = "", style = {}, whileHover = {}, 
         ...style,
         position: "relative",
       }}
-      whileHover={{ 
-        scale: 1.03, 
-        y: -6,
-        boxShadow: "0 20px 40px rgba(99, 102, 241, 0.15)",
-        borderColor: "rgba(99, 102, 241, 0.25)",
-        ...whileHover
-      }}
+      variants={dynamicVariants}
+      whileHover={isStringHover ? whileHover : hoverStyles}
       whileTap={{ scale: 0.98, ...whileTap }}
       transition={{ type: "spring", stiffness: 350, damping: 20, ...transition }}
+      onClick={onClick}
     >
       {/* Background Hover Light Gradient */}
       <motion.div
@@ -656,6 +667,11 @@ const initialArticles = [
     imageAlt: "Zero-Hallucination RAG Chatbot architecture blueprint integrating LlamaIndex, Qdrant and Medusa E-Commerce catalog indexing",
     isExternal: false,
     url: "",
+    complexity: "Advanced Vector Search & RAG",
+    metric: "180ms Response Latency",
+    framework: "LlamaIndex & FastAPI Core",
+    techStack: ["LlamaIndex", "Qdrant", "PostgreSQL", "FastAPI", "Medusa API"],
+    takeaway: "Achieving zero hallucination in e-commerce pipelines requires moving past plain semantic matches. Integrating active database validation at the candidate selection gateway ensures perfect inventory grounding.",
     sections: [
       {
         heading: "1. The E-Commerce Recommendation Paradigm",
@@ -681,6 +697,11 @@ const initialArticles = [
     imageAlt: "Empirical comparison of classical statistical ARIMA forecasting and dynamic neural LSTM time-series analysis for financial market trend prediction",
     isExternal: false,
     url: "",
+    complexity: "Neural Net Optimization",
+    metric: "0.002 MSE Validation Loss",
+    framework: "LSTM + Streamlit Visuals",
+    techStack: ["Python", "ARIMA", "Prophet", "LSTM", "Streamlit", "Flask"],
+    takeaway: "Classical statistical forecasting remains superior for short-term prediction ranges, whereas deep recurrent networks (LSTMs) outshine statistics when catching non-linear structural transitions across long temporal sequences.",
     sections: [
       {
         heading: "1. Classical Statistics vs. Recurrent Neural Nets",
@@ -706,6 +727,11 @@ const initialArticles = [
     imageAlt: "17-agent autonomous SEO optimization swarm framework loop and supervisor orchestrator flow graph",
     isExternal: false,
     url: "",
+    complexity: "Distributed Swarms",
+    metric: "17 Parallel Worker Nodes",
+    framework: "Hermes Framework & Git",
+    techStack: ["Hermes Framework", "Python", "OpenRouter API", "Redis", "Git"],
+    takeaway: "Autonomous agent operations succeed when governed by multi-tenant State Gateways rather than point-to-point requests. Supervisors can proactively re-route workflows dynamically on token failures or runtime errors.",
     sections: [
       {
         heading: "1. The Multi-Agent Swarm Orchestration Loop",
@@ -2323,27 +2349,43 @@ export default function Home() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.55, type: "spring", stiffness: 90, damping: 14, delay: idx * 0.1 }}
                 className="glass-card"
-                style={{ padding: '2.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', borderTop: `3px solid ${art.color}` }}
+                whileHover="hover"
+                style={{ padding: '2.5rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', borderTop: `3px solid ${art.color}`, cursor: 'pointer' }}
+                onClick={() => {
+                  if (art.isExternal) {
+                    window.open(art.url, '_blank');
+                  } else {
+                    setSelectedArticle(art);
+                  }
+                }}
               >
                 <div>
                   {art.image && (
                     <div style={{ position: 'relative', width: '100%', height: '180px', borderRadius: '12px', overflow: 'hidden', marginBottom: '1.5rem', border: '1px solid rgba(255,255,255,0.06)' }}>
-                      {art.isExternal ? (
-                        <img
-                          src={art.image}
-                          alt={art.imageAlt}
-                          title={art.imageAlt}
-                          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                        />
-                      ) : (
-                        <Image
-                          src={art.image}
-                          alt={art.imageAlt}
-                          title={art.imageAlt}
-                          fill
-                          style={{ objectFit: 'cover' }}
-                        />
-                      )}
+                      <motion.div
+                        variants={{
+                          hover: { scale: 1.06 }
+                        }}
+                        transition={{ duration: 0.4, ease: "easeOut" }}
+                        style={{ width: '100%', height: '100%', position: 'relative' }}
+                      >
+                        {art.isExternal ? (
+                          <img
+                            src={art.image}
+                            alt={art.imageAlt}
+                            title={art.imageAlt}
+                            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                          />
+                        ) : (
+                          <Image
+                            src={art.image}
+                            alt={art.imageAlt}
+                            title={art.imageAlt}
+                            fill
+                            style={{ objectFit: 'cover' }}
+                          />
+                        )}
+                      </motion.div>
                     </div>
                   )}
                   <div className="flex" style={{ justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.2rem' }}>
@@ -2355,41 +2397,21 @@ export default function Home() {
                   <h3 style={{ fontSize: '1.35rem', fontWeight: 800, marginBottom: '1rem', lineHeight: 1.4, color: '#ffffff' }}>{art.title}</h3>
                   <p style={{ color: '#a1a1aa', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '2rem' }}>{art.desc}</p>
                 </div>
-                <button
-                  onClick={() => {
-                    if (art.isExternal) {
-                      window.open(art.url, '_blank');
-                    } else {
-                      setSelectedArticle(art);
-                    }
-                  }}
-                  className="flex flex-center"
-                  style={{
-                    width: '100%',
-                    background: 'rgba(255,255,255,0.03)',
-                    border: '1px solid rgba(255,255,255,0.06)',
-                    color: '#ffffff',
-                    padding: '0.85rem',
-                    borderRadius: '12px',
-                    fontWeight: 700,
-                    fontSize: '0.9rem',
-                    gap: '0.5rem',
-                    cursor: 'pointer',
-                    transition: 'all 0.3s'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.background = art.color;
-                    e.currentTarget.style.borderColor = art.color;
-                    e.currentTarget.style.boxShadow = `0 10px 25px ${art.color}35`;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
-                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.06)';
-                    e.currentTarget.style.boxShadow = 'none';
-                  }}
+                <div 
+                  className="flex" 
+                  style={{ alignItems: 'center', gap: '0.4rem', color: art.color, fontWeight: 700, fontSize: '0.95rem', marginTop: '0.5rem' }}
                 >
-                  Read Article <ArrowRight size={16} />
-                </button>
+                  Read Case Study
+                  <motion.span
+                    variants={{
+                      hover: { x: 6 }
+                    }}
+                    transition={{ duration: 0.25, ease: "easeInOut" }}
+                    style={{ display: 'inline-flex', alignItems: 'center' }}
+                  >
+                    <ArrowRight size={16} />
+                  </motion.span>
+                </div>
               </SpotlightCard>
             ))}
           </div>
@@ -2423,18 +2445,20 @@ export default function Home() {
               transition={{ type: "spring", stiffness: 300, damping: 25 }}
               style={{
                 width: '100%',
-                maxWidth: '750px',
-                background: 'rgba(10, 10, 16, 0.98)',
-                border: `1.5px solid ${selectedArticle.color}40`,
-                boxShadow: `0 30px 60px rgba(0,0,0,0.8), 0 0 40px ${selectedArticle.color}15`,
+                maxWidth: '920px',
+                background: 'rgba(9, 9, 14, 0.98)',
+                border: `1px solid ${selectedArticle.color}35`,
+                boxShadow: `0 35px 80px rgba(0,0,0,0.85), 0 0 50px ${selectedArticle.color}12`,
                 borderRadius: '24px',
-                padding: '3rem',
                 position: 'relative',
                 maxHeight: '90vh',
                 overflowY: 'auto'
               }}
               onClick={(e) => e.stopPropagation()}
             >
+              {/* Top Reading Progress Bar */}
+              <div style={{ position: 'sticky', top: 0, left: 0, right: 0, height: '4px', background: `linear-gradient(90deg, ${selectedArticle.color}, transparent)`, zIndex: 100 }} />
+
               {/* Close Button */}
               <button
                 onClick={() => setSelectedArticle(null)}
@@ -2453,7 +2477,8 @@ export default function Home() {
                   justifyContent: 'center',
                   cursor: 'pointer',
                   transition: 'all 0.2s',
-                  fontWeight: 800
+                  fontWeight: 800,
+                  zIndex: 90
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = 'rgba(255,255,255,0.1)';
@@ -2467,45 +2492,153 @@ export default function Home() {
                 ✕
               </button>
 
-              <div className="flex" style={{ gap: '1rem', alignItems: 'center', marginBottom: '1.5rem' }}>
-                <span style={{ fontSize: '0.85rem', fontWeight: 700, color: selectedArticle.color, background: `${selectedArticle.color}12`, padding: '0.4rem 0.9rem', borderRadius: '8px', border: `1px solid ${selectedArticle.color}25` }}>
-                  {selectedArticle.category}
-                </span>
-                <span style={{ fontSize: '0.85rem', color: '#71717a' }}>{selectedArticle.readTime}</span>
-              </div>
-
-              {selectedArticle.image && (
-                <div style={{ position: 'relative', width: '100%', height: '280px', borderRadius: '16px', overflow: 'hidden', marginBottom: '2rem', border: '1px solid rgba(255,255,255,0.08)' }}>
-                  <Image
-                    src={selectedArticle.image}
-                    alt={selectedArticle.imageAlt}
-                    title={selectedArticle.imageAlt}
-                    fill
-                    style={{ objectFit: 'cover' }}
-                  />
+              <div style={{ padding: '3.5rem 3.5rem 2.5rem 3.5rem' }}>
+                {/* Meta details */}
+                <div className="flex" style={{ gap: '1rem', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
+                  <span style={{ fontSize: '0.85rem', fontWeight: 800, color: selectedArticle.color, background: `${selectedArticle.color}12`, padding: '0.4rem 0.9rem', borderRadius: '8px', border: `1px solid ${selectedArticle.color}25`, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                    {selectedArticle.category}
+                  </span>
+                  <span className="flex flex-center" style={{ fontSize: '0.85rem', color: '#71717a', gap: '0.3rem' }}>
+                    <Clock size={14} /> {selectedArticle.readTime}
+                  </span>
+                  <span style={{ fontSize: '0.85rem', color: '#71717a' }}>• Published Technical Writing</span>
                 </div>
-              )}
 
-              <h2 style={{ fontSize: '2.2rem', fontWeight: 900, marginBottom: '2rem', lineHeight: 1.3, letterSpacing: '-0.5px', color: '#ffffff' }}>
-                {selectedArticle.title}
-              </h2>
+                <h2 style={{ fontSize: '2.5rem', fontWeight: 900, marginBottom: '2.5rem', lineHeight: 1.25, letterSpacing: '-0.8px', color: '#ffffff' }}>
+                  {selectedArticle.title}
+                </h2>
 
-              <div style={{ color: '#e4e4e7', fontSize: '1.05rem', lineHeight: 1.8, fontWeight: 400, fontFamily: 'var(--font-sans)', textAlign: 'justify' }}>
-                {selectedArticle.sections ? (
-                  selectedArticle.sections.map((sec: any, sIdx: number) => (
-                    <div key={sIdx} style={{ marginBottom: '2.5rem' }}>
-                      <h4 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#ffffff', marginBottom: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                        <span style={{ display: 'inline-block', width: '4px', height: '18px', borderRadius: '2px', background: selectedArticle.color }}></span>
-                        {sec.heading}
-                      </h4>
-                      <p style={{ color: '#a1a1aa', fontSize: '1rem', lineHeight: 1.7 }}>{sec.text}</p>
-                    </div>
-                  ))
-                ) : (
-                  (selectedArticle.content || selectedArticle.desc).split('\n\n').map((para: string, pIdx: number) => (
-                    <p key={pIdx} style={{ marginBottom: '1.5rem' }}>{para}</p>
-                  ))
+                {selectedArticle.image && (
+                  <div style={{ position: 'relative', width: '100%', height: '340px', borderRadius: '20px', overflow: 'hidden', marginBottom: '3rem', border: '1px solid rgba(255,255,255,0.08)', boxShadow: `0 15px 40px rgba(0,0,0,0.6)` }}>
+                    <Image
+                      src={selectedArticle.image}
+                      alt={selectedArticle.imageAlt || selectedArticle.title}
+                      title={selectedArticle.imageAlt || selectedArticle.title}
+                      fill
+                      style={{ objectFit: 'cover' }}
+                      priority
+                    />
+                  </div>
                 )}
+
+                {/* Main Dynamic Grid Content */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '3.5rem', alignItems: 'start' }}>
+                  
+                  {/* Left Column (Rich technical text) */}
+                  <div style={{ gridColumn: 'span 2', color: '#e4e4e7', fontSize: '1.05rem', lineHeight: 1.8, fontFamily: 'var(--font-sans)', textAlign: 'justify' }}>
+                    
+                    {/* Key takeaway highlight box */}
+                    {selectedArticle.takeaway && (
+                      <div style={{ background: `${selectedArticle.color}07`, borderLeft: `4px solid ${selectedArticle.color}`, padding: '1.5rem 1.8rem', borderRadius: '12px', marginBottom: '2.5rem', borderTopRightRadius: '12px', borderBottomRightRadius: '12px', boxShadow: 'inset 0 0 20px rgba(255,255,255,0.01)' }}>
+                        <h4 style={{ fontWeight: 800, color: '#ffffff', fontSize: '1.05rem', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                          💡 Core Architecture Takeaway
+                        </h4>
+                        <p style={{ margin: 0, fontSize: '0.95rem', color: '#b4b4bb', lineHeight: 1.6, textAlign: 'left' }}>
+                          {selectedArticle.takeaway}
+                        </p>
+                      </div>
+                    )}
+
+                    {selectedArticle.sections ? (
+                      selectedArticle.sections.map((sec: any, sIdx: number) => (
+                        <div key={sIdx} style={{ marginBottom: '2.5rem' }}>
+                          <h4 style={{ fontSize: '1.35rem', fontWeight: 800, color: '#ffffff', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                            <span style={{ display: 'inline-block', width: '4px', height: '18px', borderRadius: '2px', background: selectedArticle.color }}></span>
+                            {sec.heading}
+                          </h4>
+                          <p style={{ color: '#a1a1aa', fontSize: '1rem', lineHeight: 1.75, textAlign: 'left' }}>{sec.text}</p>
+                        </div>
+                      ))
+                    ) : (
+                      (selectedArticle.content || selectedArticle.desc).split('\n\n').map((para: string, pIdx: number) => (
+                        <p key={pIdx} style={{ marginBottom: '1.5rem', color: '#a1a1aa', fontSize: '1rem', lineHeight: 1.75, textAlign: 'left' }}>{para}</p>
+                      ))
+                    )}
+                  </div>
+
+                  {/* Right Column (Side Systems telemetry Dashboard) */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', background: 'rgba(255,255,255,0.01)', border: '1px solid rgba(255,255,255,0.04)', padding: '2rem', borderRadius: '20px', position: 'sticky', top: '80px' }}>
+                    <div>
+                      <h4 style={{ fontSize: '0.8rem', fontWeight: 800, color: '#71717a', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '1rem' }}>
+                        System Telemetry
+                      </h4>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '0.6rem' }}>
+                          <span style={{ color: '#a1a1aa', fontSize: '0.9rem' }}>Read Complexity</span>
+                          <span style={{ color: '#ffffff', fontWeight: 700, fontSize: '0.9rem' }}>{selectedArticle.complexity || "Standard Audit"}</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '0.6rem' }}>
+                          <span style={{ color: '#a1a1aa', fontSize: '0.9rem' }}>Core Framework</span>
+                          <span style={{ color: '#ffffff', fontWeight: 700, fontSize: '0.9rem' }}>{selectedArticle.framework || "Technical Writing"}</span>
+                        </div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '0.6rem' }}>
+                          <span style={{ color: '#a1a1aa', fontSize: '0.9rem' }}>Project Metric</span>
+                          <span style={{ color: selectedArticle.color, fontWeight: 800, fontSize: '0.9rem' }}>{selectedArticle.metric || "Verified Production"}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {selectedArticle.techStack && (
+                      <div>
+                        <h4 style={{ fontSize: '0.8rem', fontWeight: 800, color: '#71717a', textTransform: 'uppercase', letterSpacing: '1px', marginBottom: '0.8rem' }}>
+                          Engineering Tech
+                        </h4>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                          {selectedArticle.techStack.map((tech: string) => (
+                            <span key={tech} style={{ fontSize: '0.75rem', fontWeight: 600, color: '#e4e4e7', background: 'rgba(255,255,255,0.04)', padding: '0.3rem 0.6rem', borderRadius: '6px', border: '1px solid rgba(255,255,255,0.06)' }}>
+                              {tech}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Author Coordinates Profile widget */}
+                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: '1.5rem', display: 'flex', gap: '0.9rem', alignItems: 'center' }}>
+                      <div style={{ position: 'relative', width: '48px', height: '48px', borderRadius: '50%', overflow: 'hidden', border: `2px solid ${selectedArticle.color}` }}>
+                        <div style={{ width: '100%', height: '100%', background: 'linear-gradient(135deg, #6366f1, #a855f7)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ffffff', fontWeight: 800, fontSize: '0.9rem' }}>
+                          TP
+                        </div>
+                      </div>
+                      <div>
+                        <h5 style={{ color: '#ffffff', fontWeight: 800, margin: 0, fontSize: '0.95rem' }}>Tirth Patel</h5>
+                        <p style={{ color: '#71717a', fontSize: '0.8rem', margin: 0 }}>AI Engineer & Developer</p>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        setSelectedArticle(null);
+                        const contactSec = document.getElementById('contact');
+                        if (contactSec) {
+                          contactSec.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }}
+                      className="flex flex-center"
+                      style={{
+                        background: selectedArticle.color,
+                        color: '#ffffff',
+                        border: 'none',
+                        width: '100%',
+                        padding: '0.8rem',
+                        borderRadius: '10px',
+                        fontWeight: 700,
+                        fontSize: '0.85rem',
+                        cursor: 'pointer',
+                        boxShadow: `0 8px 20px ${selectedArticle.color}30`,
+                        transition: 'opacity 0.2s',
+                        gap: '0.3rem'
+                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.opacity = '0.9'}
+                      onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
+                    >
+                      Let's Collaborate <ArrowRight size={14} />
+                    </button>
+
+                  </div>
+
+                </div>
+
               </div>
             </motion.div>
           </motion.div>
