@@ -55,6 +55,10 @@ export const metadata: Metadata = {
     description: "Portfolio of Tirth Patel, specializing in autonomous AI swarms, distributed systems, and premium web experiences.",
     images: ["https://portfolio-delta-lime-36.vercel.app/og-image.png"],
   },
+  icons: {
+    icon: "/favicon.ico",
+    shortcut: "/favicon.ico",
+  },
 };
 
 export default function RootLayout({
