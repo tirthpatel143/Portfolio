@@ -1586,6 +1586,16 @@ export default function Home() {
     return () => window.removeEventListener('keydown', handleEscape);
   }, []);
 
+  // Force scroll to top on fresh page load if no anchor hash is present
+  useEffect(() => {
+    if (typeof window !== "undefined" && !window.location.hash) {
+      if ('scrollRestoration' in window.history) {
+        window.history.scrollRestoration = 'manual';
+      }
+      window.scrollTo(0, 0);
+    }
+  }, []);
+
   // Auto-scroll terminal to bottom
   useEffect(() => {
     if (terminalHistory.length > 2 && terminalContainerRef.current) {
