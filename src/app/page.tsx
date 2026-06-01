@@ -755,7 +755,7 @@ const InteractiveLab = ({ activeIdx, setActiveIdx, openFullModal }: { activeIdx:
   const [ragLogs, setRagLogs] = useState<string[]>([]);
   const [ragStatus, setRagStatus] = useState<"idle" | "running" | "done">("idle");
   const [ragAnswer, setRagAnswer] = useState("");
-  const ragLogEndRef = useRef<HTMLDivElement>(null);
+  const ragContainerRef = useRef<HTMLDivElement>(null);
 
   // Time Series States
   const [timeModel, setTimeModel] = useState<"arima" | "lstm">("lstm");
@@ -772,8 +772,11 @@ const InteractiveLab = ({ activeIdx, setActiveIdx, openFullModal }: { activeIdx:
 
   // Auto-scroll RAG logs
   useEffect(() => {
-    if (ragLogEndRef.current) {
-      ragLogEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (ragLogs.length > 0 && ragContainerRef.current) {
+      ragContainerRef.current.scrollTo({
+        top: ragContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
     }
   }, [ragLogs]);
 
@@ -1048,7 +1051,7 @@ const InteractiveLab = ({ activeIdx, setActiveIdx, openFullModal }: { activeIdx:
                     {/* Split View: Telemetry logs & generated output */}
                     <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', flex: 1 }}>
                       {/* Telemetry log shell */}
-                      <div style={{ background: '#020204', border: '1px solid rgba(255,255,255,0.04)', borderRadius: '12px', padding: '1.2rem', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', display: 'flex', flexDirection: 'column', height: '220px', overflowY: 'auto' }}>
+                      <div ref={ragContainerRef} style={{ background: '#020204', border: '1px solid rgba(255,255,255,0.04)', borderRadius: '12px', padding: '1.2rem', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', display: 'flex', flexDirection: 'column', height: '220px', overflowY: 'auto' }}>
                         <div style={{ color: '#71717a', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '0.4rem', marginBottom: '0.6rem', fontWeight: 800 }}>
                           SYSTEM AGENT TELEMETRY LOGS
                         </div>
@@ -1061,7 +1064,6 @@ const InteractiveLab = ({ activeIdx, setActiveIdx, openFullModal }: { activeIdx:
                               {log}
                             </div>
                           ))}
-                          <div ref={ragLogEndRef} />
                         </div>
                       </div>
 
@@ -1476,7 +1478,7 @@ export default function Home() {
     fetchArticles();
   }, []);
 
-  const terminalEndRef = useRef<HTMLDivElement>(null);
+  const terminalContainerRef = useRef<HTMLDivElement>(null);
 
   // Custom Cursor Spring Tracking
   const cursorX = useMotionValue(-100);
@@ -1586,8 +1588,11 @@ export default function Home() {
 
   // Auto-scroll terminal to bottom
   useEffect(() => {
-    if (terminalEndRef.current) {
-      terminalEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    if (terminalHistory.length > 2 && terminalContainerRef.current) {
+      terminalContainerRef.current.scrollTo({
+        top: terminalContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
     }
   }, [terminalHistory]);
 
@@ -2125,7 +2130,7 @@ export default function Home() {
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.3 }}
                     >
-                      <div className="terminal-body">
+                      <div ref={terminalContainerRef} className="terminal-body">
                         {terminalHistory.map((line, idx) => (
                           <div 
                             key={idx} 
@@ -2139,7 +2144,6 @@ export default function Home() {
                             {line.text}
                           </div>
                         ))}
-                        <div ref={terminalEndRef}></div>
                       </div>
                       <form onSubmit={handleTerminalSubmit} className="terminal-header" style={{ background: 'rgba(8, 8, 12, 0.95)', borderTop: '1px solid rgba(255,255,255,0.03)', padding: '0.6rem 1.2rem' }}>
                         <div className="terminal-input-line" style={{ width: '100%' }}>
