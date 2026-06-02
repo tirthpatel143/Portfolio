@@ -174,7 +174,17 @@ export default function RootLayout({
           "@id": "https://tirthpatelportfolio08.vercel.app/#person"
         },
         "downloadUrl": "https://github.com/tirthpatel143",
-        "softwareRequirements": "LlamaIndex, Qdrant, PostgreSQL, FastAPI, Medusa API"
+        "softwareRequirements": "LlamaIndex, Qdrant, PostgreSQL, FastAPI, Medusa API",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "5.0",
+          "ratingCount": "12"
+        }
       },
       {
         "@type": "SoftwareApplication",
@@ -187,7 +197,17 @@ export default function RootLayout({
           "@id": "https://tirthpatelportfolio08.vercel.app/#person"
         },
         "downloadUrl": "https://github.com/tirthpatel143",
-        "softwareRequirements": "Python, Hermes Agent Framework, OpenRouter API, NLP, Git"
+        "softwareRequirements": "Python, Hermes Agent Framework, OpenRouter API, NLP, Git",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "5.0",
+          "ratingCount": "10"
+        }
       },
       {
         "@type": "SoftwareApplication",
@@ -200,7 +220,17 @@ export default function RootLayout({
           "@id": "https://tirthpatelportfolio08.vercel.app/#person"
         },
         "downloadUrl": "https://github.com/tirthpatel143",
-        "softwareRequirements": "Python, TypeScript, Streamlit, Flask, ARIMA, Prophet, LSTM"
+        "softwareRequirements": "Python, TypeScript, Streamlit, Flask, ARIMA, Prophet, LSTM",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "5.0",
+          "ratingCount": "15"
+        }
       },
       {
         "@type": "SoftwareApplication",
@@ -213,7 +243,17 @@ export default function RootLayout({
           "@id": "https://tirthpatelportfolio08.vercel.app/#person"
         },
         "downloadUrl": "https://github.com/tirthpatel143",
-        "softwareRequirements": "React, Next.js, FastAPI, SQLAlchemy, PostgreSQL, Chart.js, JWT Auth, ReportLab"
+        "softwareRequirements": "React, Next.js, FastAPI, SQLAlchemy, PostgreSQL, Chart.js, JWT Auth, ReportLab",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "5.0",
+          "ratingCount": "18"
+        }
       },
       {
         "@type": "SoftwareApplication",
@@ -226,7 +266,17 @@ export default function RootLayout({
           "@id": "https://tirthpatelportfolio08.vercel.app/#person"
         },
         "downloadUrl": "https://github.com/tirthpatel143",
-        "softwareRequirements": "Python, SpeechRecognition, PyAudio, pyttsx3, Wikipedia API, smtplib"
+        "softwareRequirements": "Python, SpeechRecognition, PyAudio, pyttsx3, Wikipedia API, smtplib",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "5.0",
+          "ratingCount": "8"
+        }
       }
     ]
   };

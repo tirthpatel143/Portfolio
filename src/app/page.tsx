@@ -4,7 +4,7 @@ import {
   ArrowRight, Code2, Briefcase, Mail, ExternalLink, 
   Terminal, Cpu, Globe, Rocket, MessageSquare, 
   Layers, Database, Sparkles, Star, ChevronLeft, ChevronRight,
-  CheckCircle2, MapPin, Award, Send, Phone, Menu, X, Clock
+  CheckCircle2, MapPin, Award, Send, Phone, Menu, X, Clock, ChevronDown
 } from "lucide-react";
 import Image from "next/image";
 import { motion, AnimatePresence, useMotionValue, useSpring, useMotionTemplate } from "framer-motion";
@@ -1416,7 +1416,82 @@ const InteractiveLab = ({ activeIdx, setActiveIdx, openFullModal }: { activeIdx:
 };
 
 
+const faqItems = [
+  {
+    id: "agentic-ai",
+    question: "What exactly is an 'AI Orchestrator' or 'Agentic AI Developer'?",
+    category: "Agentic AI",
+    color: "#6366f1",
+    answer: "Unlike traditional software developers who write static linear code, I design autonomous agent workflows. These systems allow AI models to dynamically plan, reason, audit, and use external tools (like vector databases, APIs, and CLI environments) to solve complex workflows autonomously (like my 17-agent Hermes Swarm).",
+    agentLogs: [
+      "🤖 [CONNECT] Core gateway connected. Sector parsed: AGENTIC_AI",
+      "🧠 [NEURAL_INDEX] Retrieving Tirth's memory maps for autonomous agents...",
+      "🛡️ [VERIFICATION] Dynamic task gateways: COMPILATION SUCCESS",
+      "✅ [DECODED] AI Orchestrator defines a developer who builds self-healing, planning loops."
+    ]
+  },
+  {
+    id: "rag-models",
+    question: "How do you guarantee your RAG models don't hallucinate catalog items?",
+    category: "RAG & Vector Search",
+    color: "#ec4899",
+    answer: "I implement custom real-time adversarial validation layers. Any candidate product node retrieved from the vector store (e.g., Qdrant) is instantly audited against live storefront databases (e.g., Medusa API) to verify actual stock levels and pricing before the LLM synthesizes the final response, ensuring a 0% recommendation error rate.",
+    agentLogs: [
+      "🤖 [CONNECT] Core gateway connected. Sector parsed: RAG_VECTOR",
+      "🌐 [VECTOR_SCAN] Searching Qdrant database clusters for product candidate layers...",
+      "🛡️ [REALTIME_AUDIT] Live inventory query routed to Medusa store gateways...",
+      "✅ [DECODED] Adversarial validation intercepts LLM payload to block out-of-stock items."
+    ]
+  },
+  {
+    id: "tech-stack",
+    question: "What does your core technical arsenal look like?",
+    category: "Technical Stack",
+    color: "#06b6d4",
+    answer: "My primary stack includes LlamaIndex and LangChain for agent orchestration, Qdrant and PostgreSQL (pgvector) for semantic embeddings, Python (FastAPI / Flask) for low-latency backend systems, and Next.js / TypeScript for premium high-fidelity user experiences.",
+    agentLogs: [
+      "🤖 [CONNECT] Core gateway connected. Sector parsed: TECH_STACK",
+      "📦 [SCAN] Querying active portfolio dependencies (FastAPI, LlamaIndex, Qdrant)...",
+      "🛡️ [INTEGRITY] Framework compatibility status: 100% verified",
+      "✅ [DECODED] Backend: Python / FastAPI Core. Vector: Qdrant. Frontend: Next.js / TS."
+    ]
+  },
+  {
+    id: "voice-integration",
+    question: "Can you integrate voice interfaces into standard web portals?",
+    category: "Integrations",
+    color: "#a855f7",
+    answer: "Yes. I design custom, low-latency audio capture pipelines using PyAudio and speech-to-text models that allow spoken natural language triggers to drive complex backend commands and actions in real-time.",
+    agentLogs: [
+      "🤖 [CONNECT] Core gateway connected. Sector parsed: ACOUSTIC_CORE",
+      "🎙️ [AUDIO_CAPTURE] Initializing speech capture listeners via PyAudio modules...",
+      "🛡️ [NOISE_GATE] Acoustic latency trace calibrated: 12ms filter boundary...",
+      "✅ [DECODED] Natural language parsing translates voice inputs directly to API commands."
+    ]
+  },
+  {
+    id: "roles-availability",
+    question: "Are you open to full-time remote roles or freelance consulting?",
+    category: "Availability",
+    color: "#10b981",
+    answer: "Absolutely. I am actively exploring full-time Software Engineer / AI Engineer opportunities globally. I am highly comfortable working asynchronously across different time zones.",
+    agentLogs: [
+      "🤖 [CONNECT] Core gateway connected. Sector parsed: SCHEDULER",
+      "📅 [CHECK] Scanning global timezone calendars for Technical / AI engineering contracts...",
+      "🛡️ [LATENCY] Latency coordinates: Gandhinagar, Gujarat. Asynchronous sync active...",
+      "✅ [DECODED] Status set to: OPEN TO OPPORTUNITIES. Ready for high-impact roles."
+    ]
+  }
+];
+
 export default function Home() {
+  const [activeFaqId, setActiveFaqId] = useState<string>("agentic-ai");
+  const [faqTerminalLogs, setFaqTerminalLogs] = useState<string[]>([]);
+  const [faqTerminalStatus, setFaqTerminalStatus] = useState<"idle" | "solving" | "done">("idle");
+  const [faqTerminalAnswer, setFaqTerminalAnswer] = useState<string>("");
+  const [faqScanProgress, setFaqScanProgress] = useState<number>(0);
+  const faqTerminalContainerRef = useRef<HTMLDivElement>(null);
+
   const [activeCategory, setActiveCategory] = useState("All");
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -1606,6 +1681,45 @@ export default function Home() {
     }
   }, [terminalHistory]);
 
+  // FAQ Telemetry simulation effect
+  useEffect(() => {
+    if (!activeFaqId) return;
+    const item = faqItems.find(i => i.id === activeFaqId);
+    if (!item) return;
+
+    setFaqTerminalStatus("solving");
+    setFaqTerminalLogs([]);
+    setFaqTerminalAnswer("");
+    setFaqScanProgress(0);
+
+    let currentLogIndex = 0;
+    const logs = item.agentLogs;
+    
+    const timer = setInterval(() => {
+      if (currentLogIndex < logs.length) {
+        setFaqTerminalLogs((prev) => [...prev, logs[currentLogIndex]]);
+        setFaqScanProgress(((currentLogIndex + 1) / logs.length) * 100);
+        currentLogIndex++;
+      } else {
+        clearInterval(timer);
+        setFaqTerminalStatus("done");
+        setFaqTerminalAnswer(item.answer);
+      }
+    }, 350);
+
+    return () => clearInterval(timer);
+  }, [activeFaqId]);
+
+  // Auto-scroll FAQ terminal
+  useEffect(() => {
+    if (faqTerminalLogs.length > 0 && faqTerminalContainerRef.current) {
+      faqTerminalContainerRef.current.scrollTo({
+        top: faqTerminalContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  }, [faqTerminalLogs]);
+
   // Terminal commands handling
   const handleTerminalSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -1789,6 +1903,7 @@ export default function Home() {
             <a href="#skills" title="Inspect Tirth Patel's technical arsenal and skills stack" style={{ fontWeight: 500, fontSize: '0.95rem', color: '#a1a1aa', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#00f0ff'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>Skills</a>
             <a href="#timeline" title="View Tirth Patel's professional work experience and academic timeline" style={{ fontWeight: 500, fontSize: '0.95rem', color: '#a1a1aa', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#00f0ff'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>Experience</a>
             <a href="#articles" title="Read Tirth Patel's technical writing and blog insights" style={{ fontWeight: 500, fontSize: '0.95rem', color: '#a1a1aa', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#00f0ff'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>Articles</a>
+            <a href="#faq" title="Read frequently asked questions and systems specifications" style={{ fontWeight: 500, fontSize: '0.95rem', color: '#a1a1aa', transition: 'color 0.3s' }} onMouseEnter={(e) => e.currentTarget.style.color = '#00f0ff'} onMouseLeave={(e) => e.currentTarget.style.color = '#a1a1aa'}>FAQs</a>
             <a href="#contact" title="Go to Contact Coordinates section to message Tirth Patel" className="btn btn-primary" style={{ padding: '0.5rem 1.2rem', fontSize: '0.85rem', borderRadius: '10px' }}>
               Say Hello
             </a>
@@ -1875,6 +1990,13 @@ export default function Home() {
               style={{ fontSize: '1.1rem', fontWeight: 600, color: '#f8fafc', width: '100%', textAlign: 'center', padding: '0.5rem 0', borderBottom: '1px solid rgba(255,255,255,0.03)' }}
             >
               Articles
+            </a>
+            <a 
+              href="#faq" 
+              onClick={() => setIsMobileMenuOpen(false)}
+              style={{ fontSize: '1.1rem', fontWeight: 600, color: '#f8fafc', width: '100%', textAlign: 'center', padding: '0.5rem 0', borderBottom: '1px solid rgba(255,255,255,0.03)' }}
+            >
+              FAQs
             </a>
             <a 
               href="#contact" 
@@ -3616,6 +3738,275 @@ export default function Home() {
           );
         })()}
       </AnimatePresence>
+
+      {/* FAQ Section */}
+      <section className="section" id="faq" style={{ paddingBottom: '120px', borderTop: '1px solid var(--glass-border)', background: 'radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.01) 0%, rgba(0,0,0,0.85) 100%)', position: 'relative', overflow: 'hidden' }}>
+        <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '1px', background: 'linear-gradient(90deg, transparent, var(--glass-border), transparent)' }} />
+        
+        <div className="container">
+          <div style={{ textAlign: 'center', marginBottom: '5rem' }}>
+            <span className="tag animate-float" style={{ background: 'rgba(0, 240, 255, 0.06)', borderColor: 'rgba(0, 240, 255, 0.15)', color: 'var(--primary)', display: 'inline-flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
+              <Terminal size={14} className="text-gradient" />
+              COGNITIVE ORACLE SCANNER
+            </span>
+            <h2 style={{ fontSize: '3.5rem', fontWeight: 900, marginBottom: '1.5rem', letterSpacing: '-2px', fontFamily: 'var(--font-display)', lineHeight: 1.1 }}>
+              Interactive Knowledge <span className="text-gradient">Matrix</span>
+            </h2>
+            <p style={{ color: '#a1a1aa', fontSize: '1.15rem', maxWidth: '600px', margin: '0 auto', lineHeight: 1.6 }}>
+              Select any diagnostic node below to direct the holographic scanner swarms and decode active system operational specifications.
+            </p>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '4rem', alignItems: 'stretch' }}>
+            
+            {/* Left FAQ Dynamic Diagnostic Console */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.4rem', justifyContent: 'center' }}>
+              <span style={{ fontSize: '0.7rem', fontWeight: 800, color: '#64748b', textTransform: 'uppercase', letterSpacing: '2px', display: 'block', fontFamily: 'var(--font-mono)', marginBottom: '0.5rem' }}>
+                &gt;&gt; FAQS GATEWAY NODES LIST
+              </span>
+              
+              {faqItems.map((faq, idx) => {
+                const isActive = activeFaqId === faq.id;
+                const activeColor = faq.color;
+                
+                return (
+                  <motion.button
+                    key={faq.id}
+                    onClick={() => setActiveFaqId(faq.id)}
+                    whileHover={{ x: 6, scale: 1.01 }}
+                    whileTap={{ scale: 0.99 }}
+                    style={{
+                      background: isActive ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.01)',
+                      border: isActive ? `1.5px solid ${activeColor}` : '1px solid rgba(255,255,255,0.03)',
+                      boxShadow: isActive ? `0 0 30px ${activeColor}15, inset 0 0 15px ${activeColor}08` : 'none',
+                      borderRadius: '16px',
+                      padding: '1.4rem 1.6rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '1.5rem',
+                      textAlign: 'left',
+                      position: 'relative',
+                      overflow: 'hidden',
+                      width: '100%',
+                      fontFamily: 'inherit'
+                    }}
+                  >
+                    {/* Laser Border Sweeping Effect */}
+                    {isActive && (
+                      <motion.div
+                        style={{ position: 'absolute', inset: 0, border: `1.5px solid ${activeColor}`, borderRadius: '16px', pointerEvents: 'none' }}
+                        animate={{ opacity: [0.3, 0.8, 0.3] }}
+                        transition={{ repeat: Infinity, duration: 1.5 }}
+                      />
+                    )}
+
+                    {/* Flashing Diagnostic Indicator Bulb */}
+                    <div style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      <span style={{
+                        width: '10px',
+                        height: '10px',
+                        borderRadius: '50%',
+                        background: isActive ? activeColor : 'rgba(255,255,255,0.1)',
+                        boxShadow: isActive ? `0 0 12px ${activeColor}` : 'none',
+                        display: 'inline-block'
+                      }} />
+                      {isActive && (
+                        <motion.span
+                          animate={{ scale: [1, 2, 1], opacity: [0.4, 0, 0.4] }}
+                          transition={{ repeat: Infinity, duration: 1.8 }}
+                          style={{ position: 'absolute', width: '10px', height: '10px', borderRadius: '50%', border: `1px solid ${activeColor}` }}
+                        />
+                      )}
+                    </div>
+
+                    <div style={{ flex: 1 }}>
+                      <div className="flex" style={{ justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem' }}>
+                        <span style={{ fontSize: '0.65rem', fontWeight: 800, color: isActive ? activeColor : '#71717a', fontFamily: 'var(--font-mono)' }}>
+                          [NODE::0{idx+1}]
+                        </span>
+                        <span className="tag" style={{ fontSize: '0.6rem', padding: '0.1rem 0.5rem', background: isActive ? `${activeColor}10` : 'rgba(255,255,255,0.02)', borderColor: isActive ? `${activeColor}20` : 'rgba(255,255,255,0.04)', color: isActive ? activeColor : '#71717a' }}>
+                          SEC::{faq.category.toUpperCase().split(" ")[0]}
+                        </span>
+                      </div>
+                      <h4 style={{ fontSize: '0.98rem', fontWeight: 800, color: isActive ? '#ffffff' : '#b4b4bb', margin: 0, lineHeight: 1.3, letterSpacing: '-0.3px' }}>
+                        {faq.question}
+                      </h4>
+                    </div>
+                  </motion.button>
+                );
+              })}
+            </div>
+
+            {/* Right Telemetry Radar Scan Panel */}
+            {(() => {
+              const activeFaq = faqItems.find(i => i.id === activeFaqId) || faqItems[0];
+              return (
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <div style={{
+                    background: 'rgba(5, 5, 8, 0.9)',
+                    border: `1.5px solid ${activeFaq.color}25`,
+                    boxShadow: `0 30px 80px rgba(0,0,0,0.9), 0 0 60px ${activeFaq.color}05`,
+                    borderRadius: '28px',
+                    flex: 1,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    overflow: 'hidden',
+                    position: 'relative',
+                    padding: '2.5rem',
+                    gap: '2rem'
+                  }}>
+                    {/* Top Concentric Dials SVG Radar */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative' }}>
+                      <svg viewBox="0 0 200 200" style={{ width: '220px', height: '220px', overflow: 'visible', pointerEvents: 'none' }}>
+                        {/* Gradients definition */}
+                        <defs>
+                          <radialGradient id="radarScanGrad" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stopColor={`${activeFaq.color}20`} />
+                            <stop offset="100%" stopColor="transparent" />
+                          </radialGradient>
+                          <radialGradient id="sweepLaserGrad" cx="50%" cy="50%" r="50%">
+                            <stop offset="0%" stopColor={`${activeFaq.color}40`} />
+                            <stop offset="70%" stopColor={`${activeFaq.color}08`} />
+                            <stop offset="100%" stopColor="transparent" />
+                          </radialGradient>
+                        </defs>
+                        
+                        {/* Concentric grid circles */}
+                        <circle cx="100" cy="100" r="90" fill="none" stroke="rgba(255,255,255,0.015)" strokeWidth="1" />
+                        <circle cx="100" cy="100" r="90" fill="url(#radarScanGrad)" />
+                        <circle cx="100" cy="100" r="70" fill="none" stroke="rgba(255,255,255,0.025)" strokeWidth="1.5" strokeDasharray="4 4" />
+                        <circle cx="100" cy="100" r="50" fill="none" stroke={`${activeFaq.color}15`} strokeWidth="1" />
+                        <circle cx="100" cy="100" r="25" fill="none" stroke={`${activeFaq.color}30`} strokeWidth="1.5" strokeDasharray="2 2" />
+
+                        {/* Radar crosshairs axes */}
+                        <line x1="5" y1="100" x2="195" y2="100" stroke="rgba(255,255,255,0.02)" strokeWidth="1" />
+                        <line x1="100" y1="5" x2="100" y2="195" stroke="rgba(255,255,255,0.02)" strokeWidth="1" />
+                        
+                        {/* Glowing Outer radar ring tick lines */}
+                        {[0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330].map((deg) => {
+                          const rad = (deg * Math.PI) / 180;
+                          const x1 = (100 + 88 * Math.cos(rad)).toFixed(4);
+                          const y1 = (100 + 88 * Math.sin(rad)).toFixed(4);
+                          const x2 = (100 + 93 * Math.cos(rad)).toFixed(4);
+                          const y2 = (100 + 93 * Math.sin(rad)).toFixed(4);
+                          return (
+                            <line key={deg} x1={x1} y1={y1} x2={x2} y2={y2} stroke={deg % 90 === 0 ? `${activeFaq.color}60` : "rgba(255,255,255,0.04)"} strokeWidth={deg % 90 === 0 ? 1.5 : 1} />
+                          );
+                        })}
+
+                        {/* Animated Rotating sweeping laser cone */}
+                        <motion.path
+                          d="M 100 100 L 100 10 A 90 90 0 0 1 163.64 36.36 Z"
+                          fill="url(#sweepLaserGrad)"
+                          style={{ originX: '100px', originY: '100px' }}
+                          animate={{ rotate: 360 }}
+                          transition={{ repeat: Infinity, duration: 4.8, ease: "linear" }}
+                        />
+
+                        {/* Animated Sweep Line */}
+                        <motion.line
+                          x1="100" y1="100" x2="100" y2="10"
+                          stroke={activeFaq.color}
+                          strokeWidth="1.5"
+                          style={{ originX: '100px', originY: '100px' }}
+                          animate={{ rotate: 360 }}
+                          transition={{ repeat: Infinity, duration: 4.8, ease: "linear" }}
+                        />
+
+                        {/* Central pulsing core node */}
+                        <motion.circle
+                          cx="100" cy="100" r="12"
+                          fill={`${activeFaq.color}25`}
+                          stroke={activeFaq.color}
+                          strokeWidth="2"
+                          animate={{ scale: [1, 1.25, 1], opacity: [0.7, 1, 0.7] }}
+                          transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                        />
+                      </svg>
+
+                      {/* Diagnostic Overlay HUD text */}
+                      <div style={{ position: 'absolute', top: 5, left: 10, fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: '#64748b' }}>
+                        <div>RANGE::SYS_DECODED</div>
+                        <div>AZIMUTH::314.15°</div>
+                      </div>
+
+                      <div style={{ position: 'absolute', top: 5, right: 10, fontFamily: 'var(--font-mono)', fontSize: '0.62rem', color: '#64748b', textAlign: 'right' }}>
+                        <div>CORE_INTEGRITY::99.8%</div>
+                        <div style={{ color: activeFaq.color }}>DEC_SECTOR::ACTIVE</div>
+                      </div>
+                    </div>
+
+                    {/* Interactive Decoder Scanner Log bar */}
+                    <div style={{ background: '#020204', border: '1px solid rgba(255,255,255,0.03)', borderRadius: '14px', padding: '1rem 1.2rem', display: 'flex', flexDirection: 'column', gap: '0.45rem', minHeight: '90px' }}>
+                      <span style={{ fontSize: '0.58rem', fontWeight: 800, color: '#64748b', fontFamily: 'var(--font-mono)', display: 'block', textTransform: 'uppercase', letterSpacing: '1px' }}>
+                        Swarm Signal Tracing
+                      </span>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem', fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: '#94a3b8' }}>
+                        {faqTerminalLogs.length === 0 && (
+                          <div style={{ color: '#4b5563', fontStyle: 'italic' }}>Radar sweeping. Select active gateway node...</div>
+                        )}
+                        {faqTerminalLogs.map((log, idx) => (
+                          <div key={idx} style={{ color: log.startsWith('✅') ? '#10b981' : log.startsWith('🤖') ? activeFaq.color : '#a1a1aa' }}>
+                            &gt;&gt; {log}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Glowing decoded LCD Screen display */}
+                    <div style={{
+                      background: 'rgba(0,0,0,0.4)',
+                      border: `1.5px solid ${activeFaq.color}25`,
+                      boxShadow: `inset 0 0 15px ${activeFaq.color}05`,
+                      borderRadius: '16px',
+                      padding: '1.5rem',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      minHeight: '150px',
+                      position: 'relative'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.03)', paddingBottom: '0.5rem', marginBottom: '0.8rem', fontSize: '0.62rem', fontWeight: 800, fontFamily: 'var(--font-mono)', color: '#64748b', letterSpacing: '0.5px' }}>
+                        <span>ORACLE DECODED READOUT HUD</span>
+                        <span style={{ color: activeFaq.color }}>[SECTOR::{activeFaq.category.toUpperCase().replace(/\s+/g, "_")}]</span>
+                      </div>
+                      
+                      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                        {faqTerminalStatus === 'solving' && (
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.6rem' }}>
+                            <div style={{ height: '4px', width: '120px', background: 'rgba(255,255,255,0.02)', borderRadius: '2px', overflow: 'hidden', position: 'relative' }}>
+                              <motion.div
+                                style={{ height: '100%', background: activeFaq.color }}
+                                initial={{ width: '0%' }}
+                                animate={{ width: `${faqScanProgress}%` }}
+                                transition={{ ease: 'easeInOut' }}
+                              />
+                            </div>
+                            <span style={{ color: '#71717a', fontSize: '0.72rem', fontFamily: 'var(--font-mono)' }}>Decryption in progress...</span>
+                          </div>
+                        )}
+                        {faqTerminalStatus === 'done' && (
+                          <motion.p
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.4 }}
+                            style={{ color: '#e2e8f0', fontSize: '0.86rem', lineHeight: 1.6, margin: 0, textAlign: 'left', alignSelf: 'start' }}
+                          >
+                            {faqTerminalAnswer}
+                          </motion.p>
+                        )}
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              );
+            })()}
+
+          </div>
+        </div>
+      </section>
 
       {/* Conversion Contact Form */}
       <section className="section" id="contact" style={{ paddingBottom: '120px' }}>
