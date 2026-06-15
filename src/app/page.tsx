@@ -1060,7 +1060,7 @@ const InteractiveLab = ({ activeIdx, setActiveIdx, openFullModal }: { activeIdx:
                             <div style={{ color: '#4b5563', fontStyle: 'italic' }}>System idle. Trigger a recommendation query...</div>
                           )}
                           {ragLogs.map((log, lIdx) => (
-                            <div key={lIdx} style={{ color: log.startsWith('✅') ? '#10b981' : log.startsWith('⚡') ? activeArticle.color : '#a1a1aa', lineHeight: 1.4 }}>
+                            <div key={lIdx} style={{ color: (log && log.startsWith('✅')) ? '#10b981' : (log && log.startsWith('⚡')) ? activeArticle.color : '#a1a1aa', lineHeight: 1.4 }}>
                               {log}
                             </div>
                           ))}
@@ -3948,7 +3948,7 @@ export default function Home() {
                           <div style={{ color: '#4b5563', fontStyle: 'italic' }}>Radar sweeping. Select active gateway node...</div>
                         )}
                         {faqTerminalLogs.map((log, idx) => (
-                          <div key={idx} style={{ color: log.startsWith('✅') ? '#10b981' : log.startsWith('🤖') ? activeFaq.color : '#a1a1aa' }}>
+                          <div key={idx} style={{ color: (log && log.startsWith('✅')) ? '#10b981' : (log && log.startsWith('🤖')) ? activeFaq.color : '#a1a1aa' }}>
                             &gt;&gt; {log}
                           </div>
                         ))}
