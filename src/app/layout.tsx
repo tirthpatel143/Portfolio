@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: "ShNtUO9NIZT5fzsYO2a6QY5o63KmbBHEjt7pQS-pE68",
+    google: "googled1aa859cdf6e425c",
   },
   openGraph: {
     title: "Tirth Patel | Software Engineer & AI Orchestrator",
