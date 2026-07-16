@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  async headers() {
+  
+  compress: true,
+async headers() {
     return [
       {
         source: "/(.*)",
